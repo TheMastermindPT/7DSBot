@@ -8,7 +8,22 @@ module.exports = {
                 return s.charAt(0).toUpperCase() + s.slice(1);
             }
 
-            const type = args[0].toString();
+            if(args[1].toString.toLowerCase === 'info') {
+                message.channel.send(
+                    `
+                    List of values for:
+                    bracer: 390 to 520.
+                    neck: 195 to 260.
+                    belt: 3900 to 5200.
+                    ring: 210 to 280.
+                    ear: 105 to 140.
+                    rune: 2100 to 2800.
+                    `
+                )
+                return;
+            }
+
+            const type = args[0].toString().toLowerCase();
             let baseStat = parseInt(args[1]);
             
             const sendEmbed = (min, max) => {
@@ -37,7 +52,7 @@ module.exports = {
                         sendEmbed(min, max);
                         return;
                     }
-                    message.channel.send('Insert a correct base stat value!');
+                    message.channel.send('Insert a value beetween 390 and 520!');
                     break;
                 case 'neck':
                     min = 195;
@@ -46,7 +61,7 @@ module.exports = {
                         sendEmbed(min, max);
                         return;
                     }
-                    message.channel.send('Insert a correct base stat value!');
+                    message.channel.send('Insert a value beetween 195 and 260!');
                     break;
                 case 'belt':
                     min = 3900;
@@ -55,7 +70,7 @@ module.exports = {
                         sendEmbed(min, max);
                         return;
                     }
-                    message.channel.send('Insert a correct base stat value!');
+                    message.channel.send('Insert a value beetween 3900 and 5200!');
                     break;
                 case 'ring' :
                     min = 210;
@@ -64,7 +79,7 @@ module.exports = {
                         sendEmbed(min, max);
                         return;
                     }
-                    message.channel.send('Insert a correct base stat value!');
+                    message.channel.send('Insert a value beetween 210 and 280!');
                     break;
                 case 'ear':
                     min = 105;
@@ -73,7 +88,7 @@ module.exports = {
                         sendEmbed(min, max);
                         return;
                     }
-                    message.channel.send('Insert a correct base stat value!');
+                    message.channel.send('Insert a value beetween 105 and 140!');
                     break;
                 case 'rune': 
                     min = 2100;
@@ -82,7 +97,7 @@ module.exports = {
                         sendEmbed(min, max);
                         return;
                     }
-                    message.channel.send('Insert a correct base stat value!');
+                    message.channel.send('Insert a value beetween 2100 and 2800!');
                     break;  
                 default:
                     message.channel.send(`Insert a valid gear type. Ex: bracer, neck, belt, ring, ear, rune`);

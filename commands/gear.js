@@ -8,17 +8,17 @@ module.exports = {
                 return s.charAt(0).toUpperCase() + s.slice(1);
             }
 
-            if(args[1].toString.toLowerCase === 'info') {
+            if(args[0].toString().toLowerCase() === 'info') {
                 message.channel.send(
-                    `
-                    List of values for:
-                    bracer: 390 to 520.
-                    neck: 195 to 260.
-                    belt: 3900 to 5200.
-                    ring: 210 to 280.
-                    ear: 105 to 140.
-                    rune: 2100 to 2800.
-                    `
+                `
+                List of values for:
+                bracer: 390 to 520.
+                neck: 195 to 260.
+                belt: 3900 to 5200.
+                ring: 210 to 280.
+                ear: 105 to 140.
+                rune: 2100 to 2800.
+                `
                 )
                 return;
             }

@@ -7,7 +7,7 @@ module.exports = {
             List of commands:
             !patch: To display latest patch notes.
             !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
-            !gear [type] info : Lets you know acceptable values to this type of gear.
+            !gear info : Lets you know acceptable values to this type of gear.
             `
             )
 	},

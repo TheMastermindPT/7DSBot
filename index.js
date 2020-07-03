@@ -1,4 +1,7 @@
 const fs = require('fs');
+const express = require('express');
+const http = require('http');
+const PORT = process.env.PORT || 5000;
 const Discord = require('discord.js');
 const {token, prefix} = require('./config.json');
 const client = new Discord.Client();
@@ -6,7 +9,14 @@ client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const PREFIX = '?'; 
 
+
 //Initiates the bot
+
+http.createServer(express).listen(PORT, function() {
+  console.log(`Express server listening on port ${PORT}`);
+});
+
+
 client.on('ready', () => {
     console.log('Meliodas ready to hand out patch notes');
 });

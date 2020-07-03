@@ -6,12 +6,9 @@ module.exports = {
     script: './index.js',
     watch: ['./index.js']
   }],
-  env: {
-    "PORT": 80,
-  },
   deploy : {
     production : {
-      port : 80,
+     
       user : 'SSH_USERNAME',
       host : 'SSH_HOSTMACHINE',
       ref  : 'origin/master',

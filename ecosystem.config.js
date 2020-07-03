@@ -2,7 +2,11 @@ module.exports = {
   apps : [{
     script: 'index.js',
     watch: '.'
-  }], 
+  }, {
+    script: './index.js',
+    watch: ['./index.js']
+  }],
+
   deploy : {
     production : {
       user : 'SSH_USERNAME',

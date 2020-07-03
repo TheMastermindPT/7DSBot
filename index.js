@@ -1,5 +1,6 @@
 const fs = require('fs');
 const express = require('express');
+const app = express();
 const http = require('http');
 const PORT = process.env.PORT || 5000;
 const Discord = require('discord.js');
@@ -12,7 +13,7 @@ const PREFIX = '?';
 
 //Initiates the bot
 
-http.createServer(express).listen(PORT, function() {
+http.createServer(app).listen(PORT, function() {
   console.log(`Express server listening on port ${PORT}`);
 });
 

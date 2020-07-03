@@ -4,7 +4,7 @@ module.exports = {
     watch: '.'
   }, {
     script: './index.js',
-    watch: ['./index.js']
+    watch: ['./']
   }],
 
   deploy : {

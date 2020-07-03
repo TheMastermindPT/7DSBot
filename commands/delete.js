@@ -6,7 +6,7 @@ module.exports = {
 	execute(message, args) {
             const amount = parseInt(args[0]) + 1;
 
-            if(message.guild.ownerID === 251509011357106176) {
+            if(message.guild.ownerID === '251509011357106176') {
               if (isNaN(amount)) {
                 return message.reply('that doesn\'t seem to be a valid number.');
               } else if (amount <= 1 || amount > 100) {

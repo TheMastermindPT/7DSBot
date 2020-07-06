@@ -6,15 +6,17 @@ const {google} = require('googleapis');
 //END OF GOOGLE//
 
 module.exports = {
-	name: '!members',
+	name: '!sheet',
 	description: 'Sheet Testing',
 	execute(message, args) {
+
+    message.channel.send('command is being called!');
 
     // If modifying these scopes, delete token.json.
     // The file token.json stores the user's access and refresh tokens, and is
     // created automatically when the authorization flow completes for the first
     // time.
-    const TOKEN_PATH = 'token.json';
+    const TOKEN_PATH = '../token.json';
     const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
     
     // Load client secrets from a local file.

@@ -6,21 +6,21 @@ const {google} = require('googleapis');
 //END OF GOOGLE//
 
 module.exports = {
-	name: '!sheet',
+	name: 'sheet',
 	description: 'Sheet Testing',
 	execute(message, args) {
 
-    message.channel.send('command is being called!');
+    message.channel.send('message sent');
 
     // If modifying these scopes, delete token.json.
     // The file token.json stores the user's access and refresh tokens, and is
     // created automatically when the authorization flow completes for the first
     // time.
-    const TOKEN_PATH = '../token.json';
+    const TOKEN_PATH = 'token.json';
     const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
     
     // Load client secrets from a local file.
-    fs.readFile('../credentials.json', (err, content) => {
+    fs.readFile('credentials.json', (err, content) => {
       if (err) return console.log('Error loading client secret file:', err);
       // Authorize a client with credentials, then call the Google Sheets API.
       authorize(JSON.parse(content), listMajors);
@@ -100,8 +100,23 @@ module.exports = {
               members.name.push(member[0]);
             }
             
-            const test = members.name.toString();
-            message.channel.send(test);
+            const sendEmbed = (members) => {
+              const membersEmbed = new Discord.MessageEmbed()
+              .setColor('#821d01')
+              .setTitle('Members List')
+              .setThumbnail('https://imgur.com/KrCF24F.jpg')
+              .addFields(
+                  { name: 'Name', value: function(){
+                    for(member of members.name) {
+                      return `${member}`;
+                    }
+                  }},
+              
+              )
+              .setTimestamp()
+              message.channel.send(membersEmbed);
+          }
+
             
             
           } else {

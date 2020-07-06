@@ -1,17 +1,21 @@
+
+//REQUIRES//
 const fs = require('fs');
 const express = require('express');
-const app = express();
 const http = require('http');
-const PORT = process.env.PORT || 5000;
 const Discord = require('discord.js');
 const {token, prefix} = require('./config.json');
+
+
+// VARIABLES //
+const app = express();
+const PORT = process.env.PORT || 5000;
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const PREFIX = '?'; 
 
-
-//Initiates the bot
+//Initiates the bot//
 
 http.createServer(app).listen(PORT, function() {
   console.log(`Express server listening on port ${PORT}`);

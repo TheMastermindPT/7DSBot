@@ -59,3 +59,7 @@ typings/
 
 # next.js build output
 .next
+
+#  js files
+.ecosystem.config.js
+.credentials.json

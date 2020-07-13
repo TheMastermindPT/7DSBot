@@ -16,5 +16,11 @@
     "googleapis": "^39.2.0",
     "node-fetch": "^2.6.0",
     "pm2": "^4.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.4.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.22.0"
   }
 }

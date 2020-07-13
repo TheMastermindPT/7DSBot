@@ -1,0 +1,23 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2020": true
+    },
+    "extends": [
+        "airbnb-base"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 11
+    },
+    "rules": {
+        "no-unused-vars": "warn",
+        "no-console": "off",
+        // "prettier/prettier": ["error", { "singleQuote": true }],
+        "func-names": "off",
+        "no-process-exit": "off",
+        "linebreak-style": 0,
+        "no-plusplus": "off",
+        "no-unused-expressions": "off"
+    }
+}

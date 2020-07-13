@@ -3,27 +3,27 @@
 const fs = require('fs');
 const express = require('express');
 const http = require('http');
+const https = require('https');
 const Discord = require('discord.js');
-const {token, prefix} = require('./config.json');
+const {token, prefix} = require('./configs/config.json');
+const app = express();
 
 
 // VARIABLES //
-const app = express();
 const PORT = process.env.PORT || 5000;
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const PREFIX = '?'; 
-
-//Initiates the bot//
+let sheet;
 
 http.createServer(app).listen(PORT, function() {
   console.log(`Express server listening on port ${PORT}`);
 });
 
-
+//Initiates the bot//
 client.on('ready', () => {
-    console.log('Meliodas ready to hand out patch notes');
+    console.log('Bot executing!');
 });
 
 for (const file of commandFiles) {
@@ -39,9 +39,8 @@ client.on('message', async message => {
   const command = args.shift().toLowerCase();
 
   if (!client.commands.has(command)) return;
-
   try {
-	  client.commands.get(command).execute(message, args);
+    client.commands.get(command).execute(message, args);
   } catch (error) {
 	  console.error(error);
 	  message.reply('There was an error trying to execute that command!');

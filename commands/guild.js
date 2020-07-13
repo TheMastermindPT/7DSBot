@@ -1,28 +1,8 @@
-// GOOGLE STUFF//
 const Discord = require('discord.js');
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-// spreadsheet key is the long id in the sheets URL
-const doc = new GoogleSpreadsheet('18g1jJoEYV40skkuq9T5OW_UojGmG1g5D14jO6owBgJg');
-const auth = require('../configs/client_secret.json');
+const {
+  authenticate, getRoster, getSheet, day, monthName,
+} = require('../essentials/auth');
 
-const date = new Date();
-const day = date.toLocaleString('default', { day: 'numeric' });
-const month = date.toLocaleString('default', { month: 'numeric' });
-const monthName = date.toLocaleString('default', { month: 'long' });
-const monthIndex = {
-  7: 0,
-  8: 1,
-  9: 2,
-  10: 3,
-  11: 4,
-  12: 5,
-  1: 6,
-  2: 7,
-  3: 8,
-  4: 9,
-  5: 10,
-  6: 11,
-};
 const weeks = {
   'Week 1': ['1', '2', '3', '4'],
   'Week 2': ['5', '6', '7', '8', '9', '10', '11'],
@@ -30,20 +10,7 @@ const weeks = {
   'Week 4': ['19', '20', '21', '22', '23', '24', '25'],
   'Week 5': ['26', '27', '28', '29', '30', '31'],
 };
-
 let weekNumber;
-let sheetIndex;
-
-async function authenticate() {
-  try {
-    await doc.useServiceAccountAuth(auth);
-    await doc.loadInfo(); // loads document properties and worksheets
-    /* console.log(doc.sheetsById); */
-    return;
-  } catch (err) {
-    console.error(err);
-  }
-}
 
 function mostCP(a, b) {
   if (a.CP < b.CP) {
@@ -65,12 +32,7 @@ module.exports = {
   execute(message, args) {
     (async function () {
       try {
-        for (const [monthNumber, index] of Object.entries(monthIndex)) {
-          if (monthNumber === month) {
-            sheetIndex = index;
-          }
-        }
-        console.log(day);
+        const { roster, sheet } = await authenticate();
         // eslint-disable-next-line guard-for-in
         for (week of Object.entries(weeks)) {
           for (days of Object.values(week)[1]) {
@@ -79,10 +41,6 @@ module.exports = {
             }
           }
         }
-
-        await authenticate();
-        const roster = await doc.sheetsById[346544522];
-        const sheet = await doc.sheetsByIndex[sheetIndex];
         const members = [];
         await roster.loadCells('A1:A30'); // A1 range
         await sheet.loadCells('B4:V67');
@@ -217,7 +175,7 @@ module.exports = {
             for (member of filtered) {
               sum += member.GB;
             }
-            message.channel.send(`Median GB points of Clover-HS : ${(sum / memSum).toFixed(1)}K`);
+            message.channel.send(`Median GB points of Clover-HS : ${(sum / memSum).toFixed(1)}`);
           }
 
           const regex2 = /(tcp|bcp|tgb|bgb)/gm;
@@ -247,7 +205,7 @@ module.exports = {
                 const removed = sortGB.splice(10);
                 for (member of sortGB) {
                   exampleEmbed.setTitle(`Guild Top 10/ ${weekNumber} of ${monthName} by GB`);
-                  exampleEmbed.addFields({ name: member.name, value: `CP: ${member.CP} GB: ${member.GB}`, inline: true });
+                  exampleEmbed.addFields({ name: member.name, value: `CP: ${member.CP}K GB: ${member.GB}`, inline: true });
                 }
               } else if (args[1] === 'bgb') {
                 sortGB = filtered.sort(mostGB);

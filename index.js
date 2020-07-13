@@ -1,38 +1,43 @@
-
-//REQUIRES//
+// REQUIRES//
 const fs = require('fs');
 const express = require('express');
 const http = require('http');
-const https = require('https');
 const Discord = require('discord.js');
-const {token, prefix} = require('./configs/config.json');
-const app = express();
+const { doc, authenticate } = require('./essentials/auth');
+const { token, prefix } = require('./configs/config.json');
 
+const app = express();
 
 // VARIABLES //
 const PORT = process.env.PORT || 5000;
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const PREFIX = '?'; 
-let sheet;
+const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
-http.createServer(app).listen(PORT, function() {
+/* function onEdit(e) {
+
+  const sheet = SpreadsheetApp.getActive();
+  ScriptApp.newTrigger('myFunction')
+    .forSpreadsheet(sheet)
+    .onEdit()
+    .create();
+}
+ */
+http.createServer(app).listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`);
 });
 
-//Initiates the bot//
+// Initiates the bot//
 client.on('ready', () => {
-    console.log('Bot executing!');
+  console.log('Bot executing!');
 });
 
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
 }
 
-client.on('message', async message => {
-  
+client.on('message', async (message) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   const args = message.content.slice(prefix.length).split(/ +/);

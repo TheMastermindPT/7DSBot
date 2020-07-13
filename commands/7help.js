@@ -9,6 +9,7 @@ module.exports = {
             !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
             !gear info : Lets you know acceptable base stat values for the gear tool.
             !guild members [option] : [option] = tcp (top 10 CP) / bcp / tgb / bgb/ mcp(median).
+            !guild strikes : List of members with strikes this week.
             `
             )
 	},

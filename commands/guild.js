@@ -152,9 +152,7 @@ module.exports = {
 
           for (member of filtered) {
             let failed = member.days.map((element,index)=> {
-              // Arranjar forma de resetar os times pra 0 depois de 7 dias
-              
-              
+              // Resets Check-ins every week and counts how many times someone didnt
               if(days <= 7 ) {
                 
                 days++;
@@ -162,12 +160,14 @@ module.exports = {
                 if(days === 7) {
                   times = 0;
                 }
+
                 if(element.red === 1) {
                   times++;
 
                   if(times === 3) {
                     member.strike = true;
                   }
+
                   return true;
                 }
                 return false;

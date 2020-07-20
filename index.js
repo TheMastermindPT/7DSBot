@@ -3,7 +3,8 @@ const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const Discord = require('discord.js');
-const { doc, authenticate } = require('./essentials/auth');
+const readline = require('readline');
+const { google } = require('googleapis');
 const { token, prefix } = require('./configs/config.json');
 
 const app = express();
@@ -14,15 +15,6 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
-/* function onEdit(e) {
-
-  const sheet = SpreadsheetApp.getActive();
-  ScriptApp.newTrigger('myFunction')
-    .forSpreadsheet(sheet)
-    .onEdit()
-    .create();
-}
- */
 http.createServer(app).listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`);
 });

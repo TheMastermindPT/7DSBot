@@ -1,128 +1,101 @@
 const Discord = require('discord.js');
+const { sequelize, global } = require('../essentials/database');
 const {
-  authenticate, getRoster, getSheet, day, monthName,
+  dayN, monthS, weeks, getWeek, authenticate,
 } = require('../essentials/auth');
 
-const weeks = {
-  'Week 1': ['1', '2', '3', '4'],
-  'Week 2': ['5', '6', '7', '8', '9', '10', '11'],
-  'Week 3': ['12', '13', '14', '15', '16', '17', '18'],
-  'Week 4': ['19', '20', '21', '22', '23', '24', '25'],
-  'Week 5': ['26', '27', '28', '29', '30', '31'],
-};
-let weekNumber;
+const week = getWeek();
+const { Member, Check } = global;
 
-function mostCP(a, b) {
+const mostCP = (a, b) => {
   if (a.CP < b.CP) {
     return 1;
   }
   return -1;
-}
+};
 
-function mostGB(a, b) {
+const mostGB = (a, b) => {
   if (a.GB < b.GB) {
     return 1;
   }
   return -1;
-}
+};
 
 module.exports = {
-  name: 'guild',
+  name: 'clover',
   description: 'Spreadsheet functions...',
   execute(message, args) {
     (async function () {
       try {
-        const { roster, sheet } = await authenticate();
-        // eslint-disable-next-line guard-for-in
-        for (week of Object.entries(weeks)) {
-          for (days of Object.values(week)[1]) {
-            if (days === day) {
-              weekNumber = this.week[0];
-            }
-          }
-        }
-        const members = [];
-        await roster.loadCells('A1:A30'); // A1 range
-        await sheet.loadCells('B4:V67');
-        const weekStats = {
-          Week: weekNumber, cp: [], contribution: [], days: [],
-        };
+        const { roster, filtered } = await authenticate();
+        let counter = 0;
+        do {
+          const rosterCell = roster.getCellByA1(`A${counter + 1}`);
+          rosterCell.value = filtered[0].name;
+          counter++;
+        } while (counter < filtered.length);
 
-        const strikeColumns1 = ['C', 'D', 'E', 'F', 'G', 'H', 'I'];
-        const strikeColumns2 = ['N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+        if (args[0] === 'db') {
+          // Connect to DB
+          await sequelize.authenticate();
+          await sequelize.sync({ force: true });
 
-        const pushStats = (cells, cpColumn, gbColumn, strikeColumns, startIndex) => {
-          for (i = 0; i < 30; i++) {
-            weekStats.cp.push(cells.getCellByA1(`${cpColumn}${i + startIndex}`).formattedValue);
-            weekStats.contribution.push(cells.getCellByA1(`${gbColumn}${i + startIndex}`).formattedValue);
-            const colors = [];
+          try {
+            for await (const member of filtered) {
+              // console.log(`Day : ${getDay}, Month: ${getMonth}`);
+              const [user, created] = await Member.findOrCreate({
+                where: { name: member.name },
+                defaults: {
+                  name: member.name,
+                  guild: member.guild,
+                  cp: member.CP,
+                  gb: member.GB,
+                  strikes: member.strikes,
+                },
+              });
 
-            for (column of strikeColumns) {
-              if (strikeColumns.indexOf(column) <= 7) {
-                colors.push(cells.getCellByA1(`${column}${i + startIndex}`).backgroundColor);
+              for await (const status of member.days) {
+                const {
+                  red, green, blue,
+                } = status;
+
+                const date = new Date(status.day);
+                const getDay = date.getDate();
+                const getMonth = date.getMonth();
+
+                // PROBLEM data is being overrided everytime it loops each day//
+                if (created) {
+                  const [checks, done] = Check.findOrCreate({
+                    where: { membersIdMembers: user.idMembers },
+                    defaults: {
+                      membersIdMembers: user.idMembers,
+                      date,
+                      status: JSON.strikes({ red, green, blue }),
+                    },
+                  });
+                } else {
+                  Check.update(
+                    {
+                      date,
+                      status: JSON.stringify({ red, green, blue }),
+                    },
+                    {
+                      where: {
+                        membersIdMembers: user.idMembers,
+                      },
+                    },
+                  );
+
+                  console.log('User already exists, updating strikes');
+                }
               }
             }
-
-            weekStats.days.push(colors);
+          } catch (err) {
+            return console.error(err);
           }
-        };
-
-        for (i = 0; i < 30; i++) {
-          members.push({ name: roster.getCellByA1(`A${i + 1}`).formattedValue });
         }
 
-        switch (weekNumber) {
-          case 'Week 1':
-            console.log('Week 1');
-            pushStats(sheet, 'J', 'K', strikeColumns1, 4);
-            break;
-          case 'Week 2':
-            console.log('Week 2');
-            pushStats(sheet, 'U', 'V', strikeColumns2, 4);
-            break;
-          case 'Week 3':
-            console.log('Week 3');
-            pushStats(sheet, 'J', 'K', strikeColumns1, 38);
-            break;
-          case 'Week 4':
-            console.log('Week 4');
-            pushStats(sheet, 'U', 'V', strikeColumns2, 38);
-            break;
-          default:
-            console.log('This week is non-existent');
-            break;
-        }
-
-        for (member in members) {
-          members[member].CP = weekStats.cp[member];
-          members[member].GB = weekStats.contribution[member];
-          members[member].days = weekStats.days[member];
-          members[member].strike = false;
-        }
-
-        const regex = /^new/gim;
-        // const reqs = /^\b([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|10[0-9]{2}|11[0-8][0-9]|119[0-9])\b/gm;
-
-        const filtered = members.filter((member) => {
-          if (member.name) {
-            if (member.CP === '-' || !member.CP) {
-              member.CP = '0';
-            }
-
-            // if (member.GB.match(reqs)) {
-            //   member.strike = true;
-            // }
-
-            if (member.GB.match(regex)) {
-              member.GB = '0';
-            }
-
-            member.CP = parseFloat(parseFloat(member.CP.replace(/,/g, '.')).toFixed(1));
-            member.GB = parseInt(member.GB, 10);
-            return member;
-          }
-        });
-
+        // await sheet.saveUpdatedCells();
         if (args[0] === 'strike') {
           let times = 0;
           let columns = 0;
@@ -159,11 +132,11 @@ module.exports = {
           }
         }
 
-        if (args[0] === 'members') {
+        if (args[0] === 'hs') {
           if (args[1] === 'mcp') {
             let sum = 0;
             const memSum = filtered.length;
-            for (member of filtered) {
+            for (const member of filtered) {
               sum += member.CP;
             }
             message.channel.send(`Median CP of Clover-HS : ${(sum / memSum).toFixed(3)}K`);
@@ -181,37 +154,37 @@ module.exports = {
           const regex2 = /(tcp|bcp|tgb|bgb)/gm;
 
           if (regex2.test(args[1])) {
-            const sendEmbed = (filtered) => {
+            const sendEmbed = () => {
               const exampleEmbed = new Discord.MessageEmbed()
                 .setColor('#821d01')
                 .setThumbnail('https://imgur.com/AADFtyL.jpg');
               if (args[1] === 'tcp') {
-                sortCP = filtered.sort(mostCP);
+                const sortCP = filtered.sort(mostCP);
                 const removed = sortCP.splice(10);
-                for (member of sortCP) {
-                  exampleEmbed.setTitle(`Guild Top 10/ ${weekNumber} of ${monthName} by CP`);
+                for (const member of sortCP) {
+                  exampleEmbed.setTitle(`Guild Top 10/ ${week} of ${monthS} by CP`);
                   exampleEmbed.addFields({ name: member.name, value: `CP: ${member.CP}K GB: ${member.GB}`, inline: true });
                 }
               } else if (args[1] === 'bcp') {
-                sortCP = filtered.sort(mostCP);
+                const sortCP = filtered.sort(mostCP);
                 const removed = sortCP.splice(sortCP.length - 10);
-                for (member of removed) {
-                  exampleEmbed.setTitle(`Guild Bottom 10/ ${weekNumber} of ${monthName} by CP`);
+                for (const member of removed) {
+                  exampleEmbed.setTitle(`Guild Bottom 10/ ${week} of ${monthS} by CP`);
                   exampleEmbed.addFields({ name: member.name, value: `CP: ${member.CP}K GB: ${member.GB}`, inline: true });
                 }
               }
               if (args[1] === 'tgb') {
-                sortGB = filtered.sort(mostGB);
+                const sortGB = filtered.sort(mostGB);
                 const removed = sortGB.splice(10);
-                for (member of sortGB) {
-                  exampleEmbed.setTitle(`Guild Top 10/ ${weekNumber} of ${monthName} by GB`);
+                for (const member of sortGB) {
+                  exampleEmbed.setTitle(`Guild Top 10/ ${week} of ${monthS} by GB`);
                   exampleEmbed.addFields({ name: member.name, value: `CP: ${member.CP}K GB: ${member.GB}`, inline: true });
                 }
               } else if (args[1] === 'bgb') {
-                sortGB = filtered.sort(mostGB);
+                const sortGB = filtered.sort(mostGB);
                 const removed = sortGB.splice(sortGB.length - 10);
-                for (member of removed) {
-                  exampleEmbed.setTitle(`Guild Bottom 10/ ${weekNumber} of ${monthName} by CP`);
+                for (const member of removed) {
+                  exampleEmbed.setTitle(`Guild Bottom 10/ ${week} of ${monthS} by CP`);
                   exampleEmbed.addFields({ name: member.name, value: `CP: ${member.CP}K GB: ${member.GB}`, inline: true });
                 }
               }

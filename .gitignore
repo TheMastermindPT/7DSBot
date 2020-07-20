@@ -62,5 +62,6 @@ typings/
 
 #  js files
 .ecosystem.config.js
-.credentials.json
+.DBconfigs.json
 .client_secret.json
+.config.json

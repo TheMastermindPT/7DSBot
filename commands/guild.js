@@ -27,7 +27,7 @@ module.exports = {
   execute(message, args) {
     (async function () {
       try {
-        const { roster, filtered } = await authenticate();
+        const { sheet, roster, filtered } = await authenticate();
         let counter = 0;
         do {
           const rosterCell = roster.getCellByA1(`A${counter + 1}`);
@@ -35,49 +35,73 @@ module.exports = {
           counter++;
         } while (counter < filtered.length);
 
-        if (args[0] === 'db') {
-          // Connect to DB
-          await sequelize.authenticate();
-          await sequelize.sync({ force: true });
+        if (message.member.id === '251509011357106176') {
+          console.log('me');
+          if (args[0] === 'db') {
+            // Connect to DB
+            await sequelize.authenticate();
+            await sequelize.sync({ force: true });
 
-          for await (const member of filtered) {
-            // console.log(`Day : ${getDay}, Month: ${getMonth}`);
+            for await (const member of filtered) {
+              // console.log(`Day : ${getDay}, Month: ${getMonth}`);
 
-            const [user, created] = await Member.findOrCreate({
-              where: { name: member.name },
-              defaults: {
-                name: member.name,
-                guild: member.guild,
-                cp: member.CP,
-                gb: member.GB,
-                strikes: member.strikes,
-              },
-            });
-
-            for await (const status of member.days) {
-              const {
-                red, green, blue,
-              } = status;
-
-              const date = new Date(status.day);
-              const getDay = date.getDate();
-              const getMonth = date.getMonth();
-
-              // PROBLEM data is being overrided everytime it loops each day?//
-
-              const [checks, done] = await Check.findOrCreate({
-                where: { membersIdMembers: user.idMembers },
+              const [user, created] = await Member.findOrCreate({
+                where: { name: member.name },
                 defaults: {
-                  membersIdMembers: user.idMembers,
-                  date,
-                  status: JSON.stringify({ red, green, blue }),
+                  name: member.name,
+                  guild: member.guild,
+                  cp: member.CP,
+                  gb: member.GB,
+                  strikes: member.strikes,
                 },
               });
+
+              for await (const status of member.days) {
+                const {
+                  red, green, blue,
+                } = status;
+
+                const date = new Date(status.day);
+                const getDay = date.getDate();
+                const getMonth = date.getMonth();
+
+                // PROBLEM data is being overrided everytime it loops each day?//
+                if (created) {
+                  console.log('created');
+                  await Check.create(
+                    { membersIdMembers: user.idMembers, date, status: JSON.stringify({ red, green, blue }) },
+                  );
+                } else {
+                  const [checked, unexsisting] = await Check.findOrCreate({
+                    where: { membersIdMembers: user.idMembers },
+                    defaults: {
+                      date: status.day,
+                      status: JSON.stringify({ red, green, blue }),
+                    },
+                  });
+
+                  if (!unexsisting) {
+                    await Check.update(
+                      {
+                        date: status.day,
+                        status: JSON.stringify({ red, green, blue }),
+                      }, {
+                        where: {
+                          membersIdMembers: user.idMembers,
+                          date: status.day,
+                        },
+                      },
+                    );
+                  }
+                }
+              }
             }
           }
+        } else {
+          message.channel.send('You are not allowed to use this command.');
         }
 
-        // await sheet.saveUpdatedCells();
+        await sheet.saveUpdatedCells();
         if (args[0] === 'strike') {
           let times = 0;
           let columns = 0;

@@ -61,7 +61,7 @@ const authenticate = async function () {
     const members = [];
     const weekHeader = await sheet.getCellByA1('B1');
     const week = getWeek();
-    weekHeader.value = week;
+    weekHeader.value = `${monthS} `;
 
     const weekStats = {
       Week: week, cp: [], contribution: [], days: [],

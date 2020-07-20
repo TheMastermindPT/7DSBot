@@ -1,5 +1,3 @@
-const { Guild } = require('discord.js');
-
 // MODS = 73409241609247138
 // Admins = 662888342555197451
 

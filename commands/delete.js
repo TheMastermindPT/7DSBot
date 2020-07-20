@@ -1,13 +1,14 @@
 const { Guild } = require('discord.js');
 
-const whitelist = ['586649671460585472', '251509011357106176'];
+// MODS = 73409241609247138
+// Admins = 662888342555197451
 
 module.exports = {
   name: 'delete',
   description: 'Deletes messages from the channel from to 2 up to 100.',
   execute(message, args) {
-    const amount = parseInt(args[0]) + 1;
-    if (message.guild.ownerID === whitelist[1] || message.guild.me === whitelist[1]) {
+    const amount = parseInt(args[0], 10) + 1;
+    if (message.member.roles.cache.has('662888342555197451') || message.member.roles.cache.has('73409241609247138')) {
       if (isNaN(amount)) {
         return message.reply('that doesn\'t seem to be a valid number.');
       } if (amount <= 1 || amount > 100) {
@@ -19,5 +20,6 @@ module.exports = {
         });
       }
     }
+    return false;
   },
 };

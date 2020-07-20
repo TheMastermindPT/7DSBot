@@ -40,56 +40,40 @@ module.exports = {
           await sequelize.authenticate();
           await sequelize.sync({ force: true });
 
-          try {
-            for (const member of filtered) {
-              // console.log(`Day : ${getDay}, Month: ${getMonth}`);
-              const [user, created] = await Member.findOrCreate({
-                where: { name: member.name },
+          for await (const member of filtered) {
+            // console.log(`Day : ${getDay}, Month: ${getMonth}`);
+
+            const [user, created] = await Member.findOrCreate({
+              where: { name: member.name },
+              defaults: {
+                name: member.name,
+                guild: member.guild,
+                cp: member.CP,
+                gb: member.GB,
+                strikes: member.strikes,
+              },
+            });
+
+            for await (const status of member.days) {
+              const {
+                red, green, blue,
+              } = status;
+
+              const date = new Date(status.day);
+              const getDay = date.getDate();
+              const getMonth = date.getMonth();
+
+              // PROBLEM data is being overrided everytime it loops each day?//
+
+              const [checks, done] = await Check.findOrCreate({
+                where: { membersIdMembers: user.idMembers },
                 defaults: {
-                  name: member.name,
-                  guild: member.guild,
-                  cp: member.CP,
-                  gb: member.GB,
-                  strikes: member.strikes,
+                  membersIdMembers: user.idMembers,
+                  date,
+                  status: JSON.stringify({ red, green, blue }),
                 },
               });
-
-              for (const status of member.days) {
-                const {
-                  red, green, blue,
-                } = status;
-
-                const date = new Date(status.day);
-
-                // PROBLEM data is being overrided everytime it loops each day?//
-                if (created) {
-                  const [checks, done] = Check.findOrCreate({
-                    where: { membersIdMembers: user.idMembers },
-                    defaults: {
-                      membersIdMembers: user.idMembers,
-                      date,
-                      status: JSON.stringify({ red, green, blue }),
-                    },
-                  });
-                } else {
-                  Check.update(
-                    {
-                      date,
-                      status: JSON.stringify({ red, green, blue }),
-                    },
-                    {
-                      where: {
-                        membersIdMembers: user.idMembers,
-                      },
-                    },
-                  );
-
-                  console.log('User already exists, updating strikes');
-                }
-              }
             }
-          } catch (err) {
-            return console.error(err);
           }
         }
 

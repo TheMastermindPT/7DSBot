@@ -8,13 +8,18 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
     },
+    discordId: {
+      type: DataTypes.STRING(40),
+      allowNull: false,
+      field: 'discordId',
+    },
     name: {
       type: DataTypes.STRING(45),
       allowNull: false,
       field: 'name',
     },
     guild: {
-      type: DataTypes.STRING(45),
+      type: DataTypes.JSON,
       allowNull: false,
       field: 'guild',
     },
@@ -24,9 +29,14 @@ module.exports = function (sequelize, DataTypes) {
       field: 'cp',
     },
     gb: {
-      type: DataTypes.INTEGER(5),
+      type: DataTypes.INTEGER(11),
       allowNull: true,
       field: 'gb',
+    },
+    friendCode: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
+      field: 'friendCode',
     },
     strikes: {
       type: DataTypes.INTEGER(1),

@@ -5,6 +5,7 @@ const sequelize = new Sequelize('7dsbot', 'root', 'root', {
   host: 'localhost',
   dialect: 'mysql',
   port: 8889,
+  // logging: console.log(''),
 });
 console.log('Local DB');
 

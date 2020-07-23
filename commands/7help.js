@@ -5,12 +5,9 @@ module.exports = {
     message.channel.send(
       `
             List of commands:
-            !patch: To display latest patch notes.
+            !patch: To display latest patch notes (To come).
             !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
             !gear info : Lets you know acceptable base stat values for the gear tool.
-            !clover glb [option] : [option] = tcp (top 10 CP) / bcp / tgb / bgb/ mcp(median).
-            !clover hs [option] : [option] = tcp (top 10 CP) / bcp / tgb / bgb/ mcp(median).
-            !guild strike : List of members with strikes this week.
             `,
     );
   },

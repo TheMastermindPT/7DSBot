@@ -1,11 +1,12 @@
 const Discord = require('discord.js');
 const { sequelize, global } = require('../essentials/database');
+
+const { Member, Check } = global;
 const {
-  dayN, monthS, weeks, getWeek, authenticate,
+  dayN, monthS, weeks, getWeek, authenticate, membersArray,
 } = require('../essentials/auth');
 
 const week = getWeek();
-const { Member, Check } = global;
 
 const mostCP = (a, b) => {
   if (a.CP < b.CP) {
@@ -27,7 +28,8 @@ module.exports = {
   execute(message, args) {
     (async function () {
       try {
-        const { sheet, roster, filtered } = await authenticate();
+        const { roster } = await authenticate({ sheetCells: 'B1:L33' });
+        const { filtered } = await membersArray({ sheetCells: 'B1:L33' });
         let counter = 0;
         do {
           const rosterCell = roster.getCellByA1(`A${counter + 1}`);
@@ -35,9 +37,8 @@ module.exports = {
           counter++;
         } while (counter < filtered.length);
 
-        if (message.member.id === '251509011357106176') {
-          console.log('me');
-          if (args[0] === 'db') {
+        if (args[0] === 'db') {
+          if (message.member.id === '251509011357106176') {
             // Connect to DB
             await sequelize.authenticate();
             await sequelize.sync({ force: true });
@@ -68,7 +69,7 @@ module.exports = {
                 // PROBLEM data is being overrided everytime it loops each day?//
                 if (created) {
                   console.log('created');
-                  await Check.create(
+                  Check.create(
                     { membersIdMembers: user.idMembers, date, status: JSON.stringify({ red, green, blue }) },
                   );
                 } else {
@@ -81,7 +82,7 @@ module.exports = {
                   });
 
                   if (!unexsisting) {
-                    await Check.update(
+                    Check.update(
                       {
                         date: status.day,
                         status: JSON.stringify({ red, green, blue }),
@@ -96,12 +97,11 @@ module.exports = {
                 }
               }
             }
+          } else {
+            message.channel.send('You are not allowed to use this command.');
           }
-        } else {
-          message.channel.send('You are not allowed to use this command.');
         }
 
-        await sheet.saveUpdatedCells();
         if (args[0] === 'strike') {
           let times = 0;
           let columns = 0;

@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 // spreadsheet key is the long id in the sheets URL
-const doc = new GoogleSpreadsheet('1NlFFA9XUAkGCyID9B5cyjdb2FXmmUOiEzlaPWhqzrSo');
-const async = require('async');
+const doc = new GoogleSpreadsheet('1D46g29_u7-uLC23zCOH3YO8cwUkmWmJaRVKr2cGt8Zg');
+const moment = require('moment');
 const auth = require('../configs/client_secret.json');
 
 const date = new Date();
@@ -24,6 +24,12 @@ const monthIndex = {
   6: 11,
 };
 
+const today = moment().utc().tz('Europe/Lisbon');
+const startWeek = today.clone().startOf('week');
+const endWeek = today.clone().endOf('week');
+const sunday = moment().utc().tz('Europe/Lisbon').day('Sunday');
+const diff = today.diff(sunday, 'days', true);
+
 const weeks = {
   'Week 1': ['1', '2', '3', '4', '5', '6', '7'],
   'Week 2': ['8', '9', '10', '11', '12', '13', '14'],
@@ -43,12 +49,16 @@ const getWeek = () => {
   }
 };
 
+const strikeColumnsDays = ['C', 'D', 'E', 'F', 'G', 'H', 'I'];
+const strikeColumnsPoints = ['J', 'K', 'L'];
+const mergedColumns = [...strikeColumnsDays, ...strikeColumnsPoints];
+
 const asyncFilter = async (arr, predicate) => {
   const results = await Promise.all(arr.map(predicate));
   return arr.filter((_v, index) => results[index]);
 };
 
-const authenticate = async function () {
+const authenticate = async ({ sheetCells }) => {
   try {
     await doc.useServiceAccountAuth(auth);
     await doc.loadInfo(); // loads document properties and worksheets
@@ -56,36 +66,41 @@ const authenticate = async function () {
     const sheet = await doc.sheetsById[0];
 
     await roster.loadCells('A1:A30'); // A1 range
-    await sheet.loadCells('B1:L33');
+    await sheet.loadCells(sheetCells);
+    return { sheet, roster };
+  } catch (err) {
+    return console.error(err);
+  }
+};
 
+const membersArray = async ({ sheetCells }) => {
+  try {
+    const { sheet, roster } = await authenticate({ sheetCells });
     const members = [];
     const weekHeader = await sheet.getCellByA1('B1');
     const week = getWeek();
-    weekHeader.value = `${monthS} `;
+    weekHeader.value = `${monthS} ${startWeek.format('D')}th-${endWeek.format('D')}th`;
 
     const weekStats = {
       Week: week, cp: [], contribution: [], days: [],
     };
 
-    const strikeColumns1 = ['C', 'D', 'E', 'F', 'G', 'H', 'I'];
-
-    const pushStats = (cells, cpColumn, gbColumn, strikeColumns, startIndex) => {
+    const pushStats = (cells, cpColumn, gbColumn, daysColumns, startIndex) => {
       for (let i = 0; i < 30; i++) {
         weekStats.cp.push(cells.getCellByA1(`${cpColumn}${i + startIndex}`).formattedValue);
         weekStats.contribution.push(cells.getCellByA1(`${gbColumn}${i + startIndex}`).formattedValue);
         const colors = [];
 
-        for (const column of strikeColumns) {
-          if (strikeColumns.indexOf(column) <= 7) {
-            const index = strikeColumns.indexOf(column);
+        for (const column of daysColumns) {
+          if (daysColumns.indexOf(column) <= 7) {
+            const index = daysColumns.indexOf(column);
             const colorObj = cells.getCellByA1(`${column}${i + startIndex}`).backgroundColor;
             const dayCell = cells.getCellByA1(`${column}${i + startIndex}`).formattedValue;
-            const invertedIndex = 6 - index;
-
-            const statusDay = new Date();
-            statusDay.setDate(statusDay.getDate() - invertedIndex);
-
+            const statusDay = today.clone().startOf('week');
             const myObj = {};
+
+            statusDay.add(index, 'd');
+            statusDay.format('YYYY-MM-DD');
             Object.assign(myObj, colorObj);
             myObj.day = statusDay;
             colors.push(myObj);
@@ -97,10 +112,10 @@ const authenticate = async function () {
     };
 
     // Push members and their respective data
-    for (let i = 0; i < 30; i++) {
-      members.push({ name: roster.getCellByA1(`A${i + 1}`).formattedValue });
-    }
-    pushStats(sheet, 'J', 'K', strikeColumns1, 4);
+    // for (let i = 0; i < 30; i++) {
+    //   members.push({ name: roster.getCellByA1(`A${i + 1}`).formattedValue });
+    // }
+    pushStats(sheet, 'J', 'K', strikeColumnsDays, 4);
     //
 
     switch (week) {
@@ -122,11 +137,13 @@ const authenticate = async function () {
     }
 
     for (const member in members) {
-      members[member].CP = weekStats.cp[member];
-      members[member].GB = weekStats.contribution[member];
-      members[member].days = weekStats.days[member];
-      members[member].strikes = 0;
-      members[member].guild = 'Clover-HS';
+      if (Object.prototype.hasOwnProperty.call(members, member)) {
+        members[member].CP = weekStats.cp[member];
+        members[member].GB = weekStats.contribution[member];
+        members[member].days = weekStats.days[member];
+        members[member].strikes = 0;
+        members[member].guild = 'CloverHs';
+      }
     }
 
     const regex = /^new/gim;
@@ -143,7 +160,7 @@ const authenticate = async function () {
         //   member.strike = true;
         // }
 
-        if (member.GB.match(regex)) {
+        if (!member.GB || member.GB.match(regex)) {
           member.GB = '0';
         }
 
@@ -153,13 +170,62 @@ const authenticate = async function () {
       }
       return false;
     });
-    return { roster, sheet, filtered };
+
+    await sheet.saveUpdatedCells();
+    return { filtered };
   } catch (err) {
     console.error(err);
     return err;
   }
 };
 
+/* const clearData = async (startIndex) => {
+  // if starting sunday of week
+  const { sheet, roster } = await authenticate({ sheetCells: 'B4:L33' });
+
+  const indexes = [];
+  const promises = [];
+
+  for (let i = 0; i < 30; i++) {
+    indexes.push(i);
+  }
+
+  for await (const i of indexes) {
+    const member = roster.getCellByA1(`A${i + 1}`);
+    member.value = '';
+    for (const column of mergedColumns) {
+      if (mergedColumns.indexOf(column) <= 9) {
+        const done = new Promise((resolve, reject) => {
+          const info = sheet.getCellByA1(`${column}${i + startIndex}`);
+          info.value = '';
+          if (info.backgroundColor.red === 1 || info.backgroundColor.green === 1) {
+            resolve(info);
+          } else {
+            resolve(false);
+          }
+        });
+        promises.push(done);
+      }
+    }
+  }
+
+  await Promise.all(promises);
+
+  const checkIns = await asyncFilter(promises, async (promise) => {
+    if (promise) return promise;
+    return new Error('This is not a valid checkIn color');
+  });
+
+  for await (const status of checkIns) {
+    status.backgroundColor = { red: 0.7882353, green: 0.85490197, blue: 0.972549 };
+    await status.save();
+  }
+
+  await roster.saveUpdatedCells();
+};
+
+clearData(4); */
+
 module.exports = {
-  doc, auth, authenticate, dayN, monthN, monthS, getWeek,
+  doc, auth, authenticate, membersArray, dayN, monthN, monthS, getWeek,
 };

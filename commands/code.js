@@ -82,7 +82,7 @@ module.exports = {
         const userRegex = /[a-zA-Z]{4,20}\d{0,9}/gi;
         // const usersArray = Object.values(users);
 
-        if (args[0] === 'clover') {
+        if (args[0] === 'all') {
           const all = await Member.findAll({
             attributes: ['name', 'guild', 'friendCode'],
           });

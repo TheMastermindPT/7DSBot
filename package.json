@@ -6,7 +6,7 @@
   "scripts": {
     "start": "pm2-runtime start ecosystem.config.js --env production",
     "local": "nodemon --inspect --watch ./ --watch ./index.js",
-    "local2": "pm2-runtime start ecosystem.config.js --env development"
+    "local2": "pm2-runtime start ecosystem.config.js --env production"
   },
   "author": "",
   "license": "ISC",
@@ -23,7 +23,8 @@
     "nodemon": "^2.0.4",
     "pm2": "^4.4.0",
     "sequelize": "^6.3.3",
-    "sequelize-auto": "^0.5.2"
+    "sequelize-auto": "^0.5.2",
+    "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
     "eslint": "^7.4.0",

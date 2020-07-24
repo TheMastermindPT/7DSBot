@@ -1,0 +1,19 @@
+{
+  "development": {
+   "username": "root",
+   "password": "root",
+   "database": "casascoimbra",
+   "host": "localhost",
+   "port": 8889,
+   "dialect": "mysql"
+ },
+ "production": {
+   "host": "b8rg15mwxwynuk9q.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
+   "database": "ucp5np6d9w43fcgo",
+   "username" : "o5fmnii1vuxn19ff",
+   "port":3306,
+   "password" :"dxatcw8qntsq4vbh",
+   "URI": "mysql://o5fmnii1vuxn19ff:dxatcw8qntsq4vbh@b8rg15mwxwynuk9q.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/ucp5np6d9w43fcgo",
+   "dialect": "mysql"
+ }
+}

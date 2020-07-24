@@ -21,7 +21,6 @@ module.exports = {
 
         if (args[0] === 'set') {
           await sequelize.authenticate();
-          await sequelize.sync({ force: true });
 
           if (regex.test(args[1])) {
             const messageUser = users.find((member) => member.id === message.member.id);

@@ -3,14 +3,10 @@ const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const Discord = require('discord.js');
-const readline = require('readline');
-const { google } = require('googleapis');
-const { userInfo } = require('os');
 const { token, prefix } = require('./configs/config.json');
 const { sequelize, global } = require('./essentials/database');
 
 // VARIABLES //
-const isProd = process.env.NODE_ENV === 'production' || null;
 const { Member, Check } = global;
 const app = express();
 const guildID = '662888155501821953';
@@ -20,103 +16,105 @@ client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
 http.createServer(app).listen(PORT, () => {
-  console.log(`Express server listening on port ${PORT}`);
-});
-
-// Initiates the bot//
-client.on('ready', async () => {
-  const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
-  const members = cloverDiscord.members.cache.map((member) => {
-    if (!member.user.bot) {
-      return member;
-    }
-    return {};
-  });
-
-  const clovers = members.map((member) => {
-    if (member.user) {
-      const { user, nickname } = member;
-      const name = member.user.username;
-      const guild = [user];
-
-      if (nickname) {
-        guild[0].nick = nickname;
+  // Initiates the bot//
+  client.on('ready', async () => {
+    const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
+    const members = cloverDiscord.members.cache.map((member) => {
+      if (!member.user.bot) {
+        return member;
       }
+      return {};
+    });
 
-      if (member._roles) {
-        const { _roles } = member;
-        for (const role of _roles) {
-          switch (role) {
-            case '734392418203598930':
-              guild.push('Friends of Guild');
-              break;
-            case '734123385940082698':
-              guild.push('CloverHs');
-              break;
-            case '734123118402076672':
-              guild.push('Clover');
-              break;
-            default:
-              break;
-          }
+    const clovers = members.map((member) => {
+      if (member.user) {
+        const { user, nickname } = member;
+        const name = member.user.username;
+        const guild = [user];
+
+        if (nickname) {
+          guild[0].nick = nickname;
         }
-        return guild;
+
+        if (member._roles) {
+          const { _roles } = member;
+          for (const role of _roles) {
+            switch (role) {
+              case '734392418203598930':
+                guild.push('Friends of Guild');
+                break;
+              case '734123385940082698':
+                guild.push('CloverHs');
+                break;
+              case '734123118402076672':
+                guild.push('Clover');
+                break;
+              default:
+                break;
+            }
+          }
+          return guild;
+        }
+      }
+      return [];
+    });
+
+    for await (const member of clovers) {
+      if (member.length) {
+        let name = '';
+
+        if (member[0].nick) {
+          name = member[0].nick.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
+        } else {
+          name = member[0].username.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
+        }
+        // eslint-disable-next-line prefer-const
+        let [{ id }, ...guild] = member;
+        guild.sort();
+        guild = JSON.stringify(guild);
+
+        const [user, created] = await Member.findOrCreate({
+          where: { discordId: id },
+          defaults: {
+            name,
+            guild,
+            discordId: id,
+          },
+        });
+
+        if (!created) {
+          await Member.update(
+            { name, guild }, { where: { discordId: id } },
+          );
+        }
       }
     }
-    return [];
+
+    console.log('Bot is executing!');
   });
 
-  for await (const member of clovers) {
-    if (member.length) {
-      let name = '';
-
-      if (member[0].nick) {
-        name = member[0].nick.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
-      } else {
-        name = member[0].username.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
-      }
-      let [{ id }, ...guild] = member;
-      guild.sort();
-      guild = JSON.stringify(guild);
-
-      const [user, created] = await Member.findOrCreate({
-        where: { discordId: id },
-        defaults: {
-          name,
-          guild,
-          discordId: id,
-        },
-      });
-
-      if (!created) {
-        await Member.update(
-          { name, guild }, { where: { discordId: id } },
-        );
-      }
-    }
+  for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    client.commands.set(command.name, command);
   }
-  console.log('Bot executing!');
-});
 
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.name, command);
-}
+  client.on('message', async (message) => {
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-client.on('message', async (message) => {
-  if (!message.content.startsWith(prefix) || message.author.bot) return;
+    const args = message.content.slice(prefix.length).split(/ +/);
+    const command = args.shift().toLowerCase();
 
-  const args = message.content.slice(prefix.length).split(/ +/);
-  const command = args.shift().toLowerCase();
-
-  if (!client.commands.has(command)) return;
-  try {
-    client.commands.get(command).execute(message, args);
-  } catch (error) {
+    if (!client.commands.has(command)) return;
+    try {
+      client.commands.get(command).execute(message, args);
+    } catch (error) {
 	  console.error(error);
 	  message.reply('There was an error trying to execute that command!');
-  }
-});
+    }
+  });
 
-// Authenticates the bot with the token
-client.login(token);
+  // Authenticates the bot with the token
+  client.login(token);
+
+  console.log(`Express server listening on port ${PORT}`);
+});

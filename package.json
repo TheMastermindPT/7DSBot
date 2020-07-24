@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "pm2-runtime start ecosystem.config.js --env production",
-    "local": "nodemon --inspect --watch ./ --watch ./index.js"
+    "local": "nodemon --inspect --watch ./ --watch ./index.js",
+    "local2": "pm2-runtime start ecosystem.config.js --env development"
   },
   "author": "",
   "license": "ISC",

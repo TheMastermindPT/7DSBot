@@ -5,13 +5,13 @@ let sequelize;
 
 if (process.env.DATABASE_URL) {
   sequelize = new Sequelize('mysql://upm5jroj83u3117q:mmgbgr1xykptvi40@b8rg15mwxwynuk9q.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/pak75fpp9dovqjpx');
-  console.log('production DB');
+  console.log('Production DB');
 } else {
   sequelize = new Sequelize('7dsbot', 'root', 'root', {
     host: 'localhost',
     dialect: 'mysql',
     port: 8889,
-    // logging: console.log(''),
+    logging: console.log,
   });
   console.log('Local DB');
 }

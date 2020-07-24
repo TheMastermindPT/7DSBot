@@ -1,5 +1,4 @@
 /* jshint indent: 2 */
-
 module.exports = function (sequelize, DataTypes) {
   const Member = sequelize.define('Member', {
     idMembers: {

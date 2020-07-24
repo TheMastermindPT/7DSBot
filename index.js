@@ -4,10 +4,9 @@ const express = require('express');
 const http = require('http');
 const Discord = require('discord.js');
 const { token, prefix } = require('./configs/config.json');
-const { sequelize, global } = require('./essentials/database');
+const db = require('./models/index');
 
 // VARIABLES //
-const { Member, Check } = global;
 const app = express();
 const guildID = '662888155501821953';
 const PORT = process.env.PORT || 5000;
@@ -17,8 +16,6 @@ const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith
 
 http.createServer(app).listen(PORT, async () => {
   // Initiates the bot//
-
-  await sequelize.authenticate();
 
   client.on('ready', async () => {
     const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
@@ -76,7 +73,7 @@ http.createServer(app).listen(PORT, async () => {
         guild.sort();
         guild = JSON.stringify(guild);
 
-        const [user, created] = await Member.findOrCreate({
+        const [user, created] = await db.Member.findOrCreate({
           where: { discordId: id },
           defaults: {
             name,
@@ -86,7 +83,7 @@ http.createServer(app).listen(PORT, async () => {
         });
 
         if (!created) {
-          await Member.update(
+          await db.Member.update(
             { name, guild }, { where: { discordId: id } },
           );
         }

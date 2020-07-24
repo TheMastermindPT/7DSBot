@@ -2,7 +2,7 @@
   "development": {
    "username": "root",
    "password": "root",
-   "database": "casascoimbra",
+   "database": "7dsbot",
    "host": "localhost",
    "port": 8889,
    "dialect": "mysql"

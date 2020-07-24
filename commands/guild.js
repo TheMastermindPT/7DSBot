@@ -1,7 +1,5 @@
 const Discord = require('discord.js');
-const { sequelize, global } = require('../essentials/database');
-
-const { Member, Check } = global;
+const { db } = require('../models/index');
 const {
   dayN, monthS, weeks, getWeek, authenticate, membersArray,
 } = require('../essentials/auth');
@@ -40,13 +38,10 @@ module.exports = {
         if (args[0] === 'db') {
           if (message.member.id === '251509011357106176') {
             // Connect to DB
-            await sequelize.authenticate();
-            await sequelize.sync({ force: true });
-
             for await (const member of filtered) {
               // console.log(`Day : ${getDay}, Month: ${getMonth}`);
 
-              const [user, created] = await Member.findOrCreate({
+              const [user, created] = await db.Member.findOrCreate({
                 where: { name: member.name },
                 defaults: {
                   name: member.name,
@@ -69,11 +64,11 @@ module.exports = {
                 // PROBLEM data is being overrided everytime it loops each day?//
                 if (created) {
                   console.log('created');
-                  Check.create(
+                  db.Check.create(
                     { membersIdMembers: user.idMembers, date, status: JSON.stringify({ red, green, blue }) },
                   );
                 } else {
-                  const [checked, unexsisting] = await Check.findOrCreate({
+                  const [checked, unexsisting] = await db.Check.findOrCreate({
                     where: { membersIdMembers: user.idMembers },
                     defaults: {
                       date: status.day,
@@ -82,7 +77,7 @@ module.exports = {
                   });
 
                   if (!unexsisting) {
-                    Check.update(
+                    db.Check.update(
                       {
                         date: status.day,
                         status: JSON.stringify({ red, green, blue }),
@@ -151,7 +146,7 @@ module.exports = {
           if (args[1] === 'mgb') {
             let sum = 0;
             const memSum = filtered.length;
-            for (member of filtered) {
+            for (const member of filtered) {
               sum += member.GB;
             }
             message.channel.send(`Median GB points of Clover-HS : ${(sum / memSum).toFixed(1)}`);

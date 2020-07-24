@@ -1,7 +1,5 @@
 const Discord = require('discord.js');
-const { sequelize, global } = require('../essentials/database');
-
-const { Member } = global;
+const { db } = require('../models/index');
 
 module.exports = {
   name: 'friend',
@@ -20,8 +18,6 @@ module.exports = {
         });
 
         if (args[0] === 'set') {
-          await sequelize.authenticate();
-
           if (regex.test(args[1])) {
             const messageUser = users.find((member) => member.id === message.member.id);
             const friendCode = args[1];
@@ -55,7 +51,7 @@ module.exports = {
 
             const name = messageUser.username.replace(/[^a-zA-Z0-9]/g, '');
 
-            const [user, created] = await Member.findOrCreate({
+            const [user, created] = await db.Member.findOrCreate({
               where: { discordId: message.member.id },
               defaults: {
                 discordId: message.member.id,
@@ -65,7 +61,7 @@ module.exports = {
             });
 
             if (!created) {
-              Member.update(
+              db.Member.update(
                 { friendCode, name, guild }, { where: { discordId: message.member.id } },
               );
             } else {
@@ -82,7 +78,7 @@ module.exports = {
         // const usersArray = Object.values(users);
 
         if (args[0] === 'all') {
-          const all = await Member.findAll({
+          const all = await db.Member.findAll({
             attributes: ['name', 'guild', 'friendCode'],
           });
 
@@ -136,7 +132,7 @@ module.exports = {
         if (args[1] !== 'set') {
           if (discordId.test(args[0])) {
             console.log(typeof discordId);
-            const found = await Member.findOne({ where: { discordId: args[0] } });
+            const found = await db.Member.findOne({ where: { discordId: args[0] } });
 
             if (found) {
               const { name, guild, friendCode } = found;

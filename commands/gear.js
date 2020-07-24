@@ -9,17 +9,17 @@ module.exports = {
       return s.charAt(0).toUpperCase() + s.slice(1);
     };
 
-    if (args[0].toString().toLowerCase() === 'info') {
+    if (args[0].toString().toLowerCase() === 'type') {
       message.channel.send(
         `
-                List of values for:
-                bracer: 390 to 520.
-                neck: 195 to 260.
-                belt: 3900 to 5200.
-                ring: 210 to 280.
-                ear: 105 to 140.
-                rune: 2100 to 2800.
-                `,
+      List of arguments:
+      !gear bracer [value]
+      !gear neck [value]
+      !gear belt [value]
+      !gear ring [value]
+      !gear ear [value]
+      !gear rune [value]
+        `,
       );
       return;
     }

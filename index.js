@@ -10,6 +10,7 @@ const { token, prefix } = require('./configs/config.json');
 const { sequelize, global } = require('./essentials/database');
 
 // VARIABLES //
+const isProd = process.env.NODE_ENV === 'production' || null;
 const { Member, Check } = global;
 const app = express();
 const guildID = '662888155501821953';

@@ -79,7 +79,7 @@ module.exports = {
           return new Error('Insert a valid friend code!');
         }
 
-        const userRegex = /[a-zA-Z]{4,20}\d{0,9}/gi;
+        const discordId = /\d{18}/gi;
         // const usersArray = Object.values(users);
 
         if (args[0] === 'all') {
@@ -135,13 +135,13 @@ module.exports = {
         }
 
         if (args[1] !== 'set') {
-          if (userRegex.test(args[0])) {
-            const matching = new RegExp(`(${args[0]})`, 'gi');
-            const matched = args[0].match(matching);
-            const found = await Member.findOne({ where: { name: matched[0] } });
+          if (discordId.test(args[0])) {
+            console.log(typeof discordId);
+            const found = await Member.findOne({ where: { discordId: args[0] } });
+
             if (found) {
               const { name, guild, friendCode } = found;
-              return message.channel.send(`The friend code of \`${name}\` from \`${JSON.parse(guild)[0]}\` is \`${friendCode}\`.`);
+              return message.channel.send(`The friend code of \`${name}\` from \`${JSON.parse(guild)[0]}\` is \`${friendCode || 'not set'}\`.`);
             }
             return message.channel.send('That user does not exist.');
           }

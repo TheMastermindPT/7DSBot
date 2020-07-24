@@ -4,7 +4,11 @@ const { Check, Member } = require('../models');
 let sequelize;
 
 if (process.env.DATABASE_URL) {
-  sequelize = new Sequelize('mysql://o5fmnii1vuxn19ff:dxatcw8qntsq4vbh@b8rg15mwxwynuk9q.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/ucp5np6d9w43fcgo');
+  sequelize = new Sequelize('ucp5np6d9w43fcgo', 'o5fmnii1vuxn19ff', 'dxatcw8qntsq4vbh', {
+    host: 'b8rg15mwxwynuk9q.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
+    dialect: 'mysql',
+    port: 3306,
+  });
   console.log('Production DB');
 } else {
   sequelize = new Sequelize('7dsbot', 'root', 'root', {

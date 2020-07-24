@@ -15,8 +15,11 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
-http.createServer(app).listen(PORT, () => {
+http.createServer(app).listen(PORT, async () => {
   // Initiates the bot//
+
+  await sequelize.authenticate();
+
   client.on('ready', async () => {
     const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
     const members = cloverDiscord.members.cache.map((member) => {

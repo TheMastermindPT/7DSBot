@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'sdsbot',
-    script: './index.js',
+    script: 'index.js',
     instances: '1',
     watch: true,
     ignore_watch: ['node_modules', 'logs/output'],

@@ -1,67 +1,56 @@
-module.exports = (sequelize, DataTypes) => {
-  const Member = sequelize.define('Member', {
+module.exports = {
+  up: (queryInterface, Sequelize) => queryInterface.createTable('members', {
     idMembers: {
       autoIncrement: true,
-      type: DataTypes.INTEGER(11),
+      type: Sequelize.INTEGER(11),
       allowNull: false,
       primaryKey: true,
     },
     discordId: {
-      type: DataTypes.STRING(40),
+      type: Sequelize.STRING(40),
       allowNull: false,
       field: 'discordId',
     },
     name: {
-      type: DataTypes.STRING(45),
+      type: Sequelize.STRING(45),
       allowNull: false,
       field: 'name',
     },
     guild: {
-      type: DataTypes.JSON,
+      type: Sequelize.JSON,
       allowNull: false,
       field: 'guild',
     },
     cp: {
-      type: DataTypes.FLOAT,
+      type: Sequelize.FLOAT,
       allowNull: true,
       field: 'cp',
     },
     gb: {
-      type: DataTypes.INTEGER(11),
+      type: Sequelize.INTEGER(11),
       allowNull: true,
       field: 'gb',
     },
     friendCode: {
-      type: DataTypes.INTEGER(11),
+      type: Sequelize.INTEGER(11),
       allowNull: true,
       field: 'friendCode',
     },
     strikes: {
-      type: DataTypes.INTEGER(1),
+      type: Sequelize.INTEGER(1),
       allowNull: true,
       field: 'strikes',
     },
     createdAt: {
-      type: DataTypes.DATEONLY,
+      type: Sequelize.DATEONLY,
       allowNull: false,
       field: 'createdAt',
     },
     updatedAt: {
-      type: DataTypes.DATEONLY,
+      type: Sequelize.DATEONLY,
       allowNull: false,
       field: 'updatedAt',
     },
-  }, {
-    sequelize,
-    tableName: 'members',
-  });
-
-  Member.associate = function (models) {
-    Member.hasMany(models.Check, {
-      foreignKey: 'membersIdMembers',
-      sourceKey: 'idMembers',
-    });
-  };
-
-  return Member;
+  }),
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('members'),
 };

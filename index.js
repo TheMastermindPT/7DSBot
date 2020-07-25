@@ -92,7 +92,7 @@ https.createServer(app).listen(PORT, async () => {
             );
           }
         } catch (err) {
-          return console.err(err);
+          return console.error(err);
         }
       }
     }

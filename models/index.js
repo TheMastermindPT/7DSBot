@@ -7,7 +7,7 @@ const { LOCAL_URL } = localEnv;
 const { NODE_ENV, JAWSDB_URL } = process.env;
 
 let sequelize;
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && process.env.JAWSDB_URL) {
   sequelize = new Sequelize(JAWSDB_URL);
 } else {
   sequelize = new Sequelize(LOCAL_URL);

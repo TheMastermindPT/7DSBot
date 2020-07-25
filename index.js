@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const db = require('./models/index');
 
 // VARIABLES //
-const { TOKEN, PREFIX } = env;
+const { token, PREFIX } = env;
 const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -111,4 +111,4 @@ client.on('message', async (message) => {
 });
 
 // Authenticates the bot with the token
-client.login(TOKEN);
+client.login(token);

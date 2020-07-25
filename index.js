@@ -14,6 +14,7 @@ for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
   client.commands.set(command.name, command);
 }
+
 client.on('ready', async () => {
   const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
   const members = cloverDiscord.members.cache.map((member) => {

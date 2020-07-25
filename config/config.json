@@ -12,7 +12,7 @@
     "password": "dxatcw8qntsq4vbh",
     "database": "ucp5np6d9w43fcgo",
     "host": "b8rg15mwxwynuk9q.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
-    "dialect": "mysql",
+    "dialect": "postgres",
     "port" : 3306
   }
 }

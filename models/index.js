@@ -1,21 +1,17 @@
-const localEnv = require('dotenv').config().parsed;
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 
-let LOCAL_URL;
-
-if (localEnv) {
-  LOCAL_URL = localEnv;
-}
-
-const { NODE_ENV, JAWSDB_URL } = process.env;
+const { NODE_ENV, JAWSDB_URL, LOCAL_URL } = process.env;
 
 let sequelize;
 if (process.env.NODE_ENV === 'production') {
   sequelize = new Sequelize(JAWSDB_URL);
+  console.log('PRODUCTION DB');
 } else {
   sequelize = new Sequelize(LOCAL_URL);
+  console.log('LOCAL DB');
 }
 
 const basename = path.basename(__filename);

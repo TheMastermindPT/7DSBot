@@ -3,7 +3,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 // spreadsheet key is the long id in the sheets URL
 const doc = new GoogleSpreadsheet('1D46g29_u7-uLC23zCOH3YO8cwUkmWmJaRVKr2cGt8Zg');
 const moment = require('moment');
-const auth = require('../configs/client_secret.json');
+const auth = require('../config/client_secret.json');
 
 const date = new Date();
 const dayN = date.toLocaleString('default', { day: 'numeric' });

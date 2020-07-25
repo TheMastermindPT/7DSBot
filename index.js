@@ -1,11 +1,11 @@
 // REQUIRES//
-const env = require('dotenv').config().parsed;
+const env = require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 const db = require('./models/index');
 
 // VARIABLES //
-const { token, PREFIX } = env;
+const { token, PREFIX } = env.parsed;
 const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();

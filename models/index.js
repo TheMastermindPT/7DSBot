@@ -1,9 +1,9 @@
-const env = require('dotenv').config().parsed;
+const env = require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 
-const { JAWSDB_URL, LOCAL_URL, NODE_ENV } = env;
+const { JAWSDB_URL, LOCAL_URL, NODE_ENV } = env.parsed;
 let sequelize;
 
 if (NODE_ENV === 'production') {

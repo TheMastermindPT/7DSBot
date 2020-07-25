@@ -3,11 +3,16 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 
-const { LOCAL_URL } = localEnv;
+let LOCAL_URL;
+
+if (localEnv) {
+  LOCAL_URL = localEnv;
+}
+
 const { NODE_ENV, JAWSDB_URL } = process.env;
 
 let sequelize;
-if (process.env.NODE_ENV === 'production' && process.env.JAWSDB_URL) {
+if (process.env.NODE_ENV === 'production') {
   sequelize = new Sequelize(JAWSDB_URL);
 } else {
   sequelize = new Sequelize(LOCAL_URL);

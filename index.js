@@ -1,7 +1,7 @@
 // REQUIRES//
 const fs = require('fs');
 const express = require('express');
-const http = require('http');
+const https = require('https');
 const Discord = require('discord.js');
 const { token, prefix } = require('./configs/config.json');
 const db = require('./models/index');
@@ -19,7 +19,7 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
-http.createServer(app).listen(PORT, async () => {
+https.createServer(app).listen(PORT, async () => {
   client.on('ready', async () => {
     const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
     const members = cloverDiscord.members.cache.map((member) => {

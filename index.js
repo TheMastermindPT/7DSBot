@@ -1,10 +1,11 @@
 // REQUIRES//
+const env = require('dotenv').config().parsed;
 const fs = require('fs');
 const Discord = require('discord.js');
-const { token, prefix } = require('./configs/config.json');
 const db = require('./models/index');
 
 // VARIABLES //
+const { TOKEN, PREFIX } = env;
 const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -95,9 +96,9 @@ client.on('ready', async () => {
 });
 
 client.on('message', async (message) => {
-  if (!message.content.startsWith(prefix) || message.author.bot) return;
+  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
-  const args = message.content.slice(prefix.length).split(/ +/);
+  const args = message.content.slice(PREFIX.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
   if (!client.commands.has(command)) return;
@@ -110,4 +111,4 @@ client.on('message', async (message) => {
 });
 
 // Authenticates the bot with the token
-client.login(token);
+client.login(TOKEN);

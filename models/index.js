@@ -1,18 +1,19 @@
+const env = require('dotenv').config().parsed;
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(`${__dirname}/../config/config.json`)[env];
-const db = {};
-
+const { JAWSDB_URL, LOCAL_URL, NODE_ENV } = env;
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+
+if (NODE_ENV === 'production') {
+  sequelize = new Sequelize(JAWSDB_URL);
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(LOCAL_URL);
 }
+
+const basename = path.basename(__filename);
+const db = {};
 
 fs
   .readdirSync(__dirname)

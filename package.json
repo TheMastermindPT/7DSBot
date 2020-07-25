@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect index.js",
+    "start": "nodemon -r dotenv/config --inspect index.js",
     "local": "nodemon --inspect --watch ./ --watch index.js"
   },
   "author": "",

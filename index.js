@@ -15,8 +15,6 @@ client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
 http.createServer(app).listen(PORT, async () => {
-  // Initiates the bot//
-
   client.on('ready', async () => {
     const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
     const members = cloverDiscord.members.cache.map((member) => {
@@ -73,19 +71,23 @@ http.createServer(app).listen(PORT, async () => {
         guild.sort();
         guild = JSON.stringify(guild);
 
-        const [user, created] = await db.Member.findOrCreate({
-          where: { discordId: id },
-          defaults: {
-            name,
-            guild,
-            discordId: id,
-          },
-        });
+        try {
+          const [user, created] = await db.Member.findOrCreate({
+            where: { discordId: id },
+            defaults: {
+              name,
+              guild,
+              discordId: id,
+            },
+          });
 
-        if (!created) {
-          await db.Member.update(
-            { name, guild }, { where: { discordId: id } },
-          );
+          if (!created) {
+            db.Member.update(
+              { name, guild }, { where: { discordId: id } },
+            );
+          }
+        } catch (err) {
+          return console.err(err);
         }
       }
     }

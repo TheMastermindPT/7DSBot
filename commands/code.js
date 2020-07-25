@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { db } = require('../models/index');
+const db = require('../models/index');
 
 module.exports = {
   name: 'friend',
@@ -132,13 +132,17 @@ module.exports = {
         if (args[1] !== 'set') {
           if (discordId.test(args[0])) {
             console.log(typeof discordId);
-            const found = await db.Member.findOne({ where: { discordId: args[0] } });
 
-            if (found) {
-              const { name, guild, friendCode } = found;
-              return message.channel.send(`The friend code of \`${name}\` from \`${JSON.parse(guild)[0]}\` is \`${friendCode || 'not set'}\`.`);
+            try {
+              const found = await db.Member.findOne({ where: { discordId: args[0] } });
+              if (found) {
+                const { name, guild, friendCode } = found;
+                return message.channel.send(`The friend code of \`${name}\` from \`${JSON.parse(guild)[0]}\` is \`${friendCode || 'not set'}\`.`);
+              }
+              return message.channel.send('That user does not exist.');
+            } catch (err) {
+              return console.error(err);
             }
-            return message.channel.send('That user does not exist.');
           }
           return message.channel.send('This is not a valid username');
         }

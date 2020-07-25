@@ -9,7 +9,7 @@ module.exports = {
       !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
       !gear type : Lets you know the arguments for the specific gear type.
       !friend set [yourcode] = Saves your code on a database.
-      !friend [username] = Search for this user and retrieves his friend code.
+      !friend [discordid] = Search for this user and retrieves his friend code.
       !friend all = An embed with all the friend codes.
       `,
     );

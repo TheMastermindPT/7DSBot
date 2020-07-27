@@ -45,63 +45,66 @@ module.exports = {
       message.channel.send(exampleEmbed);
     };
 
-    switch (args[0]) {
-      case 'bracer':
-        min = 390;
-        max = 520;
-        if (baseStat >= min && baseStat <= max) {
-          sendEmbed(min, max);
-          return;
-        }
-        message.channel.send('Insert a value beetween 390 and 520!');
-        break;
-      case 'neck':
-        min = 195;
-        max = 260;
-        if (baseStat >= min && baseStat <= max) {
-          sendEmbed(min, max);
-          return;
-        }
-        message.channel.send('Insert a value beetween 195 and 260!');
-        break;
-      case 'belt':
-        min = 3900;
-        max = 5200;
-        if (baseStat >= min && baseStat <= max) {
-          sendEmbed(min, max);
-          return;
-        }
-        message.channel.send('Insert a value beetween 3900 and 5200!');
-        break;
-      case 'ring':
-        min = 210;
-        max = 280;
-        if (baseStat >= min && baseStat <= max) {
-          sendEmbed(min, max);
-          return;
-        }
-        message.channel.send('Insert a value beetween 210 and 280!');
-        break;
-      case 'ear':
-        min = 105;
-        max = 140;
-        if (baseStat >= min && baseStat <= max) {
-          sendEmbed(min, max);
-          return;
-        }
-        message.channel.send('Insert a value beetween 105 and 140!');
-        break;
-      case 'rune':
-        min = 2100;
-        max = 2800;
-        if (baseStat >= min && baseStat <= max) {
-          sendEmbed(min, max);
-          return;
-        }
-        message.channel.send('Insert a value beetween 2100 and 2800!');
-        break;
-      default:
-        message.channel.send('Insert a valid gear type. Ex: bracer, neck, belt, ring, ear, rune');
+    const gearRegex = /[\d]{0,4}/g;
+    if (args[1] === 'type' && gearRegex.test(args[2])) {
+      switch (args[0]) {
+        case 'bracer':
+          min = 390;
+          max = 520;
+          if (baseStat >= min && baseStat <= max) {
+            sendEmbed(min, max);
+            return;
+          }
+          message.channel.send('Insert a value beetween 390 and 520!');
+          break;
+        case 'neck':
+          min = 195;
+          max = 260;
+          if (baseStat >= min && baseStat <= max) {
+            sendEmbed(min, max);
+            return;
+          }
+          message.channel.send('Insert a value beetween 195 and 260!');
+          break;
+        case 'belt':
+          min = 3900;
+          max = 5200;
+          if (baseStat >= min && baseStat <= max) {
+            sendEmbed(min, max);
+            return;
+          }
+          message.channel.send('Insert a value beetween 3900 and 5200!');
+          break;
+        case 'ring':
+          min = 210;
+          max = 280;
+          if (baseStat >= min && baseStat <= max) {
+            sendEmbed(min, max);
+            return;
+          }
+          message.channel.send('Insert a value beetween 210 and 280!');
+          break;
+        case 'ear':
+          min = 105;
+          max = 140;
+          if (baseStat >= min && baseStat <= max) {
+            sendEmbed(min, max);
+            return;
+          }
+          message.channel.send('Insert a value beetween 105 and 140!');
+          break;
+        case 'rune':
+          min = 2100;
+          max = 2800;
+          if (baseStat >= min && baseStat <= max) {
+            sendEmbed(min, max);
+            return;
+          }
+          message.channel.send('Insert a value beetween 2100 and 2800!');
+          break;
+        default:
+          message.channel.send('Insert a valid gear type. Ex: bracer, neck, belt, ring, ear, rune');
+      }
     }
   },
 };

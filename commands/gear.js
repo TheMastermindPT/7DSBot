@@ -46,7 +46,7 @@ module.exports = {
     };
 
     const gearRegex = /[\d]{0,4}/g;
-    if (args[1] === 'type' && gearRegex.test(args[2])) {
+    if (args[1] && gearRegex.test(args[2])) {
       switch (args[0]) {
         case 'bracer':
           min = 390;

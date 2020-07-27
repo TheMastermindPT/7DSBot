@@ -89,11 +89,13 @@ module.exports = {
 
             const cloverRegex = /(Clover)/gi;
             const cloverOnly = all.map((member) => {
-              if (JSON.parse(member.guild)[0].match(cloverRegex)) {
+              const guildJSON = JSON.parse(member.guild)[0];
+              if (guildJSON && guildJSON.match(cloverRegex)) {
                 if (member.friendCode) {
                   return member;
                 }
               }
+
               return {};
             });
 

@@ -1,9 +1,10 @@
 const Discord = require('discord.js');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 // spreadsheet key is the long id in the sheets URL
-const doc = new GoogleSpreadsheet('1D46g29_u7-uLC23zCOH3YO8cwUkmWmJaRVKr2cGt8Zg');
+const doc = new GoogleSpreadsheet('1btEAaXL9N702YZ2pagw98C2GKt7FzWcPq5dWVuGxp1U');
 const moment = require('moment');
 const auth = require('../config/client_secret.json');
+const db = require('../models/index');
 
 const date = new Date();
 const dayN = date.toLocaleString('default', { day: 'numeric' });
@@ -51,7 +52,6 @@ const getWeek = () => {
 
 const strikeColumnsDays = ['C', 'D', 'E', 'F', 'G', 'H', 'I'];
 const strikeColumnsPoints = ['J', 'K', 'L'];
-const mergedColumns = [...strikeColumnsDays, ...strikeColumnsPoints];
 
 const asyncFilter = async (arr, predicate) => {
   const results = await Promise.all(arr.map(predicate));
@@ -62,8 +62,8 @@ const authenticate = async ({ sheetCells }) => {
   try {
     await doc.useServiceAccountAuth(auth);
     await doc.loadInfo(); // loads document properties and worksheets
-    const roster = await doc.sheetsById[346544522];
-    const sheet = await doc.sheetsById[0];
+    const roster = doc.sheetsById[346544522];
+    const sheet = doc.sheetsById[0];
 
     await roster.loadCells('A1:A30'); // A1 range
     await sheet.loadCells(sheetCells);
@@ -73,22 +73,45 @@ const authenticate = async ({ sheetCells }) => {
   }
 };
 
-const membersArray = async ({ sheetCells }) => {
+const membersArray = async (sort) => {
+  let order;
+  console.log(sort);
+  switch (sort) {
+    case 'cp':
+      order = ['cp', 'DESC'];
+      break;
+    case 'gb':
+      order = ['gb', 'DESC'];
+      break;
+    case 'name':
+      order = ['name', 'ASC'];
+      break;
+    default:
+  }
+
   try {
-    const { sheet, roster } = await authenticate({ sheetCells });
-    const members = [];
+    const { sheet, roster } = await authenticate({ sheetCells: 'B1:M33' });
     const weekHeader = await sheet.getCellByA1('B1');
+    const cloversDB = await db.Member.findAll({ order: [order] });
     const week = getWeek();
     weekHeader.value = `${monthS} ${startWeek.format('D')}th-${endWeek.format('D')}th`;
-
+    const members = [];
     const weekStats = {
       Week: week, cp: [], contribution: [], days: [],
     };
 
-    const pushStats = (cells, cpColumn, gbColumn, daysColumns, startIndex) => {
+    // Pass names and guilds from DB to object
+    Object.values(cloversDB).map((member) => {
+      if (JSON.parse(member.guild)[0] === 'CloverHs') {
+        members.push({
+          name: member.name, guild: JSON.parse(member.guild)[0], discordId: member.discordId, cp: member.cp, gb: member.gb, strikes: member.strikes,
+        });
+      }
+      return '';
+    });
+
+    const pushStats = (cells, daysColumns, startIndex) => {
       for (let i = 0; i < 30; i++) {
-        weekStats.cp.push(cells.getCellByA1(`${cpColumn}${i + startIndex}`).formattedValue);
-        weekStats.contribution.push(cells.getCellByA1(`${gbColumn}${i + startIndex}`).formattedValue);
         const colors = [];
 
         for (const column of daysColumns) {
@@ -111,12 +134,7 @@ const membersArray = async ({ sheetCells }) => {
       }
     };
 
-    // Push members and their respective data
-    // for (let i = 0; i < 30; i++) {
-    //   members.push({ name: roster.getCellByA1(`A${i + 1}`).formattedValue });
-    // }
-    pushStats(sheet, 'J', 'K', strikeColumnsDays, 4);
-    //
+    pushStats(sheet, strikeColumnsDays, 4);
 
     switch (week) {
       case 'Week 1':
@@ -142,11 +160,10 @@ const membersArray = async ({ sheetCells }) => {
         members[member].GB = weekStats.contribution[member];
         members[member].days = weekStats.days[member];
         members[member].strikes = 0;
-        members[member].guild = 'CloverHs';
       }
     }
 
-    const regex = /^new/gim;
+    const regex = /^(new)/i;
     // const reqs = /^\b([0-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|10[0-9]{2}|11[0-8][0-9]|119[0-9])\b/gm;
 
     const filtered = await asyncFilter(members, async (i) => {
@@ -164,68 +181,82 @@ const membersArray = async ({ sheetCells }) => {
           member.GB = '0';
         }
 
-        member.CP = parseFloat(parseFloat(member.CP.replace(/,/g, '.')).toFixed(1));
+        member.CP = parseFloat(parseFloat(member.CP.replace(/,/g, '.')).toFixed(3));
         member.GB = parseInt(member.GB, 10);
         return member;
       }
       return false;
     });
 
-    await sheet.saveUpdatedCells();
-    return { filtered };
+    for await (const member of filtered) {
+      // console.log(`Name: ${member.name}/ Discord : ${member.discordId} / CP: ${member.cp}`);
+      /* await db.Member.update(
+        {
+          cp: member.CP,
+          gb: member.GB,
+          strikes: member.strikes,
+        },
+        {
+          where: {
+            discordId: member.discordId,
+          },
+        },
+      ); */
+    }
+    return { filtered, roster };
   } catch (err) {
-    console.error(err);
-    return err;
+    return console.error(err);
   }
 };
 
-/* const clearData = async (startIndex) => {
-  // if starting sunday of week
-  const { sheet, roster } = await authenticate({ sheetCells: 'B4:L33' });
+const updateSheet = async (sort) => {
+  try {
+    // if starting sunday of week
+    const { sheet, roster } = await authenticate({ sheetCells: 'B4:M33' });
+    const { filtered } = await membersArray(sort);
+    const indexes = [];
+    const promises = [];
+    const startIndex = 4;
 
-  const indexes = [];
-  const promises = [];
+    for (let i = 0; i < 30; i++) {
+      indexes.push(i);
+    }
 
-  for (let i = 0; i < 30; i++) {
-    indexes.push(i);
-  }
+    for await (const i of indexes) {
+      const member = await sheet.getCellByA1(`B${i + startIndex}`);
+      const cp = await sheet.getCellByA1(`J${i + startIndex}`);
+      const gb = await sheet.getCellByA1(`K${i + startIndex}`);
+      const strikes = await sheet.getCellByA1(`L${i + startIndex}`);
+      const discordId = await sheet.getCellByA1(`M${i + startIndex}`);
 
-  for await (const i of indexes) {
-    const member = roster.getCellByA1(`A${i + 1}`);
-    member.value = '';
-    for (const column of mergedColumns) {
-      if (mergedColumns.indexOf(column) <= 9) {
-        const done = new Promise((resolve, reject) => {
+      member.value = filtered[i].name;
+      discordId.value = filtered[i].discordId;
+      cp.value = filtered[i].cp;
+      gb.value = filtered[i].gb;
+      strikes.value = filtered[i].strikes;
+
+      for (const column of strikeColumnsDays) {
+        if (strikeColumnsDays.indexOf(column) <= 6) {
+          const index = strikeColumnsDays.indexOf(column);
           const info = sheet.getCellByA1(`${column}${i + startIndex}`);
+          const day = moment().utc().tz('Europe/Lisbon').day(index);
           info.value = '';
-          if (info.backgroundColor.red === 1 || info.backgroundColor.green === 1) {
-            resolve(info);
-          } else {
-            resolve(false);
+          if (info.backgroundColor.green === 1) {
+            info.value = '✔';
+          } else if (info.backgroundColor.red === 1) {
+            info.value = '✖';
           }
-        });
-        promises.push(done);
+        }
       }
     }
+
+    await sheet.saveUpdatedCells();
+  } catch (err) {
+    return console.error(err);
   }
-
-  await Promise.all(promises);
-
-  const checkIns = await asyncFilter(promises, async (promise) => {
-    if (promise) return promise;
-    return new Error('This is not a valid checkIn color');
-  });
-
-  for await (const status of checkIns) {
-    status.backgroundColor = { red: 0.7882353, green: 0.85490197, blue: 0.972549 };
-    await status.save();
-  }
-
-  await roster.saveUpdatedCells();
+  return 0;
 };
 
-clearData(4); */
-
 module.exports = {
-  doc, auth, authenticate, membersArray, dayN, monthN, monthS, getWeek,
+  doc, auth, authenticate, membersArray, dayN, monthN, monthS, getWeek, updateSheet,
 };

@@ -70,21 +70,21 @@ client.on('ready', async () => {
       // eslint-disable-next-line prefer-const
       let [{ id }, ...guild] = member;
       guild.sort();
-      guild = JSON.stringify(guild);
+      const guildJSON = JSON.stringify(guild);
 
       try {
         const [user, created] = await db.Member.findOrCreate({
           where: { discordId: id },
           defaults: {
             name,
-            guild,
+            guild: guildJSON,
             discordId: id,
           },
         });
 
         if (!created) {
           db.Member.update(
-            { name, guild }, { where: { discordId: id } },
+            { name, guild: guildJSON }, { where: { discordId: id } },
           );
         }
       } catch (err) {

@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { db } = require('../models/index');
 const {
-  dayN, monthS, weeks, getWeek, authenticate, membersArray,
+  dayN, monthS, weeks, getWeek, authenticate, membersArray, updateSheet,
 } = require('../essentials/auth');
 
 const week = getWeek();
@@ -26,18 +26,41 @@ module.exports = {
   execute(message, args) {
     (async function () {
       try {
-        const { roster } = await authenticate({ sheetCells: 'B1:L33' });
-        const { filtered } = await membersArray({ sheetCells: 'B1:L33' });
-        let counter = 0;
-        do {
-          const rosterCell = roster.getCellByA1(`A${counter + 1}`);
-          rosterCell.value = filtered[0].name;
-          counter++;
-        } while (counter < filtered.length);
+        await authenticate({ sheetCells: 'B4:M33' });
+        const { filtered } = await membersArray('gb');
+
+        // Fikpik and Tugalife IDS
+        if (message.member.id === '214429377696497665' || message.member.id === '251509011357106176') {
+          /*  if (args[0] === 'unlocked') {
+            const unlocked = message.guild.roles.cache.find((role) => role.id === '737329022375297034');
+
+            message.guild.members.cache.each((member) => {
+              console.log(member.roles);
+              if (!member.bot) {
+                member.roles.add(unlocked);
+              }
+            });
+            console.log('members were assigned unlocked role');
+          } */
+
+          if (args[0] === 'sheetcp') {
+            updateSheet('cp');
+            return message.channel.send('Spreadsheet ordered by cp successfully.');
+          }
+
+          if (args[0] === 'sheetgb') {
+            updateSheet('gb');
+            return message.channel.send('Spreadsheet ordered by gb successfully.');
+          }
+
+          if (args[0] === 'sheetaz') {
+            updateSheet('name');
+            return message.channel.send('Spreadsheet ordered alphabetically with success.');
+          }
+        }
 
         if (args[0] === 'db') {
           if (message.member.id === '251509011357106176') {
-            // Connect to DB
             for await (const member of filtered) {
               // console.log(`Day : ${getDay}, Month: ${getMonth}`);
 
@@ -101,23 +124,19 @@ module.exports = {
           let times = 0;
           let columns = 0;
 
-          for (member of filtered) {
+          for (const member of filtered) {
             let failed = member.days.map((element, index) => {
               // Resets Check-ins every week and counts how many times someone didnt
               if (columns <= 7) {
                 columns++;
-
                 if (columns === 7) {
                   times = 0;
                 }
-
                 if (element.red === 1) {
                   times++;
-
                   if (times === 3) {
                     member.strike = true;
                   }
-
                   return true;
                 }
                 return false;
@@ -197,6 +216,7 @@ module.exports = {
       } catch (err) {
         console.error(err);
       }
+      return 0;
     }());
   },
 };

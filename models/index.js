@@ -1,7 +1,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const Sequelize = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
 const { NODE_ENV, JAWSDB_URL, LOCAL_URL } = process.env;
 
@@ -33,5 +33,5 @@ Object.keys(db).forEach((modelName) => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-
+db.Op = Op;
 module.exports = db;

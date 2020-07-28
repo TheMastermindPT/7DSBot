@@ -87,14 +87,13 @@ const updateDB = async () => {
               { name, guild: guildJSON }, { where: { discordId: id } },
             );
           }
-          return 0;
+        } else {
+          db.Member.destroy({
+            where: {
+              discordId: id,
+            },
+          });
         }
-
-        return db.Member.destroy({
-          where: {
-            discordId: id,
-          },
-        });
       } catch (err) {
         return console.error(err);
       }

@@ -71,19 +71,22 @@ const updateDB = async () => {
       const guildJSON = JSON.stringify(guild);
 
       try {
-        const [user, created] = await db.Member.findOrCreate({
-          where: { discordId: id },
-          defaults: {
-            name,
-            guild: guildJSON,
-            discordId: id,
-          },
-        });
+        // Creates or updates user if it belongs to one of the guilds or friends of Guild
+        if (JSON.parse(guildJSON).length) {
+          const [user, created] = await db.Member.findOrCreate({
+            where: { discordId: id },
+            defaults: {
+              name,
+              guild: guildJSON,
+              discordId: id,
+            },
+          });
 
-        if (!created) {
-          db.Member.update(
-            { name, guild: guildJSON }, { where: { discordId: id } },
-          );
+          if (!created) {
+            db.Member.update(
+              { name, guild: guildJSON }, { where: { discordId: id } },
+            );
+          }
         }
       } catch (err) {
         return console.error(err);
@@ -108,6 +111,11 @@ client.on('ready', async () => {
 client.on('guildMemberAdd', async () => {
   await updateDB();
   console.log('New member in discord');
+});
+
+client.on('guildMemberUpdate', async () => {
+  await updateDB();
+  console.log('Discord member was updated');
 });
 
 client.on('message', async (message) => {

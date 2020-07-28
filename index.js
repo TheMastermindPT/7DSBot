@@ -11,12 +11,7 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.name, command);
-}
-
-client.on('ready', async () => {
+const updateDB = async () => {
   const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
   const members = cloverDiscord.members.cache.map((member) => {
     if (!member.user.bot) {
@@ -42,8 +37,11 @@ client.on('ready', async () => {
             case '734392418203598930':
               guild.push('Friends of Guild');
               break;
+            case '735107783900528751':
+              guild.push('CloverUR');
+              break;
             case '734123385940082698':
-              guild.push('CloverHs');
+              guild.push('CloverHS');
               break;
             case '734123118402076672':
               guild.push('Clover');
@@ -92,7 +90,24 @@ client.on('ready', async () => {
       }
     }
   }
+
+  return 0;
+};
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
+}
+
+client.on('ready', async () => {
+  await updateDB();
   return console.log('Bot is executing!');
+});
+
+// Create an event listener for new guild members
+client.on('guildMemberAdd', async () => {
+  await updateDB();
+  console.log('New member in discord');
 });
 
 client.on('message', async (message) => {

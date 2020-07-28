@@ -9,73 +9,20 @@ module.exports = {
       const friendCodes = async () => {
         const regex = /^\d{9}$/;
         const membersCollection = await message.guild.members.fetch();
-        const users = membersCollection.map((guild) => {
-          const { user } = guild;
-          if (!user.bot) {
-            return user;
-          }
-          return [];
-        });
+        const users = await db.Member.findAll();
 
         // FRIENDCODES CHANNEL
-        if (message.channel.id === '663213318957432887') {
+        if (message.channel.id === '663213318957432887' || message.channel.id === '734182168213061723') {
           if (args[0] === 'set') {
             if (regex.test(args[1])) {
-              const messageUser = users.find((member) => member.id === message.member.id);
+              const messageUser = users.find((member) => member.discordId === message.member.id);
               const friendCode = args[1];
               messageUser.friendCode = friendCode;
 
-              const clovers = message.member.roles.cache.map((role) => {
-                const { id } = role;
-                let guild = '';
-
-                switch (id) {
-                  case '734392418203598930':
-                    guild = 'Friends of Guild';
-                  case '734123385940082698':
-                    guild = 'CloverHS';
-                    break;
-                  case '734123118402076672':
-                    guild = 'Clover';
-                    break;
-                  default:
-                    break;
-                }
-                return guild;
-              });
-
-              const guild = clovers.find((value) => {
-                if (value) {
-                  return value;
-                }
-                return '';
-              });
-
-              const name = messageUser.username.replace(/[^a-zA-Z0-9]/g, '');
-
-              const [user, created] = await db.Member.findOrCreate({
-                where: { discordId: message.member.id },
-                defaults: {
-                  discordId: message.member.id,
-                  guild,
-                  name,
-                },
-              });
-
-              if (!created) {
-                db.Member.update(
-                  { friendCode, name, guild }, { where: { discordId: message.member.id } },
-                );
-              } else {
-                console.log('New member');
-              }
-
-              return message.channel.send(`Congratulations \`${messageUser.username}\` from \`${guild}\`. Your friend code has been set!`);
+              return message.channel.send(`Congratulations \`${messageUser.name}\` from \`${JSON.parse(messageUser.guild)[0]}\`. Your friend code has been set!`);
             }
-            message.channel.send('This is not a valid friend code!');
-            return new Error('Insert a valid friend code!');
+            return message.channel.send('This is not a valid friend code!');
           }
-          return '';
         }
 
         const discordId = /\d{18}/gi;

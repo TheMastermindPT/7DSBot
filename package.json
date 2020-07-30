@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config --inspect index.js",
-    "local": "nodemon --inspect --watch ./ --watch index.js"
+    "start": "pm2-runtime start ecosystem.config.js --env production",
+    "local": "nodemon -r dotenv/config --inspect --watch ./ --watch index.js"
   },
   "author": "",
   "license": "ISC",

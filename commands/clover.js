@@ -29,7 +29,7 @@ module.exports = {
         await authenticate({ sheetCells: 'B4:M33' });
         const { filtered } = await membersArray('gb');
 
-        // Fikpik and Tugalife IDS
+        // Fikpik and Tugalife ID
         if (message.member.id === '214429377696497665' || message.member.id === '251509011357106176') {
           /*  if (args[0] === 'unlocked') {
             const unlocked = message.guild.roles.cache.find((role) => role.id === '737329022375297034');

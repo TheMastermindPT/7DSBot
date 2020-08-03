@@ -1,11 +1,11 @@
 module.exports = {
   apps: [{
     name: 'sdsbot',
-    script: './index.js',
+    script: 'index.js',
     instances: '1',
     exec_mode: 'cluster',
-    error_file: 'logs/errors',
-    out_file: 'logs/output',
+    error_file: 'logs/errors/err.log',
+    out_file: 'logs/output/out.log',
     env: {
       NODE_ENV: 'development',
     },

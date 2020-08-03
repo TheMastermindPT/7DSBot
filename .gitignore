@@ -61,7 +61,7 @@ typings/
 .next
 
 #  js files
-.ecosystem.config.js
-.DBconfigs.json
-.client_secret.json
-.config.json
+ecosystem.config.js
+DBconfigs.json
+client_secret.json
+config.json

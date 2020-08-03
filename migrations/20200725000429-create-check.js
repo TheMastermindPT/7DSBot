@@ -6,7 +6,7 @@ module.exports = {
       allowNull: false,
       primaryKey: true,
     },
-    membersIdMembers: {
+    membersIdMember: {
       type: Sequelize.INTEGER(11),
       allowNull: false,
       primaryKey: true,

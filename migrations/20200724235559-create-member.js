@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('members', {
-    idMembers: {
+    idMember: {
       autoIncrement: true,
       type: Sequelize.INTEGER(11),
       allowNull: false,
@@ -37,7 +37,7 @@ module.exports = {
       field: 'friendCode',
     },
     strikes: {
-      type: Sequelize.INTEGER(1),
+      type: Sequelize.INTEGER(11),
       allowNull: true,
       field: 'strikes',
     },

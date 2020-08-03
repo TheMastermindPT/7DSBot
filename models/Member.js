@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const Member = sequelize.define('Member', {
-    idMembers: {
+    idMember: {
       autoIncrement: true,
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       field: 'friendCode',
     },
     strikes: {
-      type: DataTypes.INTEGER(1),
+      type: DataTypes.INTEGER(11),
       allowNull: true,
       field: 'strikes',
     },
@@ -58,8 +58,8 @@ module.exports = (sequelize, DataTypes) => {
 
   Member.associate = function (models) {
     Member.hasMany(models.Check, {
-      foreignKey: 'membersIdMembers',
-      sourceKey: 'idMembers',
+      foreignKey: 'membersIdMember',
+      sourceKey: 'idMember',
     });
   };
 

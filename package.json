@@ -23,11 +23,11 @@
     "nodemon": "^2.0.4",
     "pm2": "^4.4.0",
     "sequelize": "^6.3.3",
-    "sequelize-auto": "^0.5.2",
+    "sequelize-auto": "^0.5.3",
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
-    "eslint": "^7.4.0",
+    "eslint": "^7.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.22.0"

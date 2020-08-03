@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
     },
-    membersIdMembers: {
+    membersIdMember: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
         model: {
           tableName: 'members',
         },
-        key: 'idMembers',
+        key: 'idMember',
       },
     },
     date: {
@@ -46,8 +46,8 @@ module.exports = function (sequelize, DataTypes) {
 
   Check.associate = function (models) {
     Check.belongsTo(models.Member, {
-      foreignKey: 'membersIdMembers',
-      targetKey: 'idMembers',
+      foreignKey: 'membersIdMember',
+      targetKey: 'idMember',
     });
   };
 

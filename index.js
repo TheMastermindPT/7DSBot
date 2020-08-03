@@ -3,6 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 const db = require('./models/index');
+const { update } = require('./essentials/auth');
 
 // VARIABLES //
 const { PREFIX, TOKEN } = process.env;
@@ -10,8 +11,9 @@ const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
+let newMember;
 
-const updateDB = async () => {
+const discordToDB = async () => {
   const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
   const members = cloverDiscord.members.cache.map((member) => {
     if (!member.user.bot) {
@@ -56,6 +58,7 @@ const updateDB = async () => {
     return [];
   });
 
+  // Add member or update to DB from Discord
   for await (const member of clovers) {
     if (member.length) {
       let name = '';
@@ -109,18 +112,34 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', async () => {
-  await updateDB();
+  await discordToDB();
+  const generalChat = client.channels.cache.find((channel) => channel.id === '662888155501821956');
+  // Update db must be in same order as updatesheet
+  // await update('gb', 'CloverHS', 'sheet');
   return console.log('Bot is executing!');
 });
 
 // Create an event listener for new guild members
-client.on('guildMemberAdd', async () => {
-  await updateDB();
+client.on('guildMemberAdd', async (member) => {
+  await discordToDB();
+  newMember = member;
+  console.log(member);
   console.log('New member in discord');
 });
 
-client.on('guildMemberUpdate', async () => {
-  await updateDB();
+client.on('guildMemberUpdate', async (member) => {
+  await discordToDB();
+  const generalChat = client.channels.cache.find((channel) => channel.id === '734182168213061723');
+
+  const clover = newMember.roles.cache.find((role) => role.id === '734123118402076672');
+  const cloverHS = newMember.roles.cache.find((role) => role.id === '734123385940082698');
+  const cloverUR = newMember.roles.cache.find((role) => role.id === '735107783900528751');
+
+  if (clover || cloverHS || cloverUR) {
+    generalChat.send(`@${clover.name} Send a warm welcome to our new member ${member.username ? member.username : member.nickname}`);
+  }
+
+  newMember = 0;
   console.log('Discord member was updated');
 });
 

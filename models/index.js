@@ -3,19 +3,17 @@ const fs = require('fs');
 const path = require('path');
 const { Sequelize, Op } = require('sequelize');
 
-const { NODE_ENV, JAWSDB_URL, LOCAL_URL } = process.env;
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(`${__dirname}/../config/config.json`)[env];
+const db = {};
 
 let sequelize;
-if (process.env.NODE_ENV === 'production') {
-  sequelize = new Sequelize(JAWSDB_URL);
-  console.log('PRODUCTION DB');
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  sequelize = new Sequelize(LOCAL_URL);
-  console.log('LOCAL DB');
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
-
-const basename = path.basename(__filename);
-const db = {};
 
 fs
   .readdirSync(__dirname)
@@ -34,4 +32,5 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 db.Op = Op;
+
 module.exports = db;

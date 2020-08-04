@@ -138,19 +138,28 @@ client.on('guildMemberAdd', async (member) => {
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   try {
     await discordToDB();
-    const generalChat = client.channels.cache.find((channel) => channel.id === '662888155501821956');
+
+    // TEST CHANNEL
+    const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
     const guildRoles = ['734123118402076672', '734123385940082698', '735107783900528751'];
 
-    const roleFound = await awaitRole(newMember.roles.cache, (role) => {
-      const exists = guildRoles.some((roleID) => roleID === role.id);
-      if (exists) {
+    const newRoles = newMember.roles.cache;
+    const oldRoles = oldMember.roles.cache;
+    const diff = oldRoles.difference(newRoles);
+
+    const guildRole = await awaitRole(diff, (role) => {
+      const some = guildRoles.some((value) => value === role.id);
+      if (some) {
         return role;
       }
-      return 0;
     });
 
-    if (roleFound.length) {
-      return generalChat.send(`<@&${roleFound[0].id}> Send a warm welcome to our new member <@${newMember.id}>`);
+    if (guildRole.length) {
+      const found = oldRoles.find((role) => role.id === guildRole[0].id);
+
+      if (!found) {
+        return welcomeChannel.send(`A warm welcome to our new member <@${newMember.id}> that just joined \`${guildRole[0].name}\``);
+      }
     }
 
     console.log('Discord member was updated');

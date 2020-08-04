@@ -131,12 +131,14 @@ client.on('guildMemberUpdate', async (member) => {
   await discordToDB();
   const generalChat = client.channels.cache.find((channel) => channel.id === '734182168213061723');
 
-  const clover = newMember.roles.cache.find((role) => role.id === '734123118402076672');
-  const cloverHS = newMember.roles.cache.find((role) => role.id === '734123385940082698');
-  const cloverUR = newMember.roles.cache.find((role) => role.id === '735107783900528751');
+  if (newMember instanceof Discord.GuildMember && newMember) {
+    const clover = newMember.roles.cache.find((role) => role.id === '734123118402076672');
+    const cloverHS = newMember.roles.cache.find((role) => role.id === '734123385940082698');
+    const cloverUR = newMember.roles.cache.find((role) => role.id === '735107783900528751');
 
-  if (clover || cloverHS || cloverUR) {
-    generalChat.send(`@${clover.name} Send a warm welcome to our new member ${member.username ? member.username : member.nickname}`);
+    if (clover || cloverHS || cloverUR) {
+      generalChat.send(`@${clover.name} Send a warm welcome to our new member ${member.username ? member.username : member.nickname}`);
+    }
   }
 
   newMember = 0;

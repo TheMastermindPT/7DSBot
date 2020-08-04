@@ -160,6 +160,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
       if (!found) {
         return welcomeChannel.send(`A warm welcome to our new member <@${newMember.id}> that just joined \`${guildRole[0].name}\``);
       }
+      return welcomeChannel.send(`Our member <@${newMember.id}> just left \`${guildRole[0].name}\``);
     }
 
     console.log('Discord member was updated');

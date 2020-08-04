@@ -138,7 +138,7 @@ client.on('guildMemberAdd', async (member) => {
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   try {
     await discordToDB();
-    const generalChat = client.channels.cache.find((channel) => channel.id === '734182168213061723');
+    const generalChat = client.channels.cache.find((channel) => channel.id === '734147050186342442');
     const guildRoles = ['734123118402076672', '734123385940082698', '735107783900528751'];
 
     const roleFound = await awaitRole(newMember.roles.cache, (role) => {

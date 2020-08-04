@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const moment = require('moment');
 const { db } = require('../models/index');
 const { monthS, update } = require('../essentials/auth');
 
@@ -22,6 +23,11 @@ module.exports = {
   execute(message, args) {
     (async function () {
       try {
+        if (args[0] === 'test') {
+          console.log(moment(message.member.joinedAt).format('DD-MM-YYYY'));
+          console.log(moment(message.createdAt));
+          console.log();
+        }
         // NEED UPDATE FUCNTION HERE TO WORK
         // Fikpik and Tugalife ID
         if (message.member.id === '214429377696497665' || message.member.id === '251509011357106176') {

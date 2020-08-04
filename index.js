@@ -2,6 +2,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
+const moment = require('moment');
 const db = require('./models/index');
 const { update } = require('./essentials/auth');
 
@@ -11,7 +12,6 @@ const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
-let newMember;
 
 const discordToDB = async () => {
   const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
@@ -111,9 +111,17 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
+const awaitRole = async (collection, predicate) => {
+  try {
+    const guildRole = await Promise.all(collection.map(predicate));
+    return guildRole.filter((el) => el);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 client.on('ready', async () => {
   await discordToDB();
-  const generalChat = client.channels.cache.find((channel) => channel.id === '662888155501821956');
   // Update db must be in same order as updatesheet
   // await update('gb', 'CloverHS', 'sheet');
   return console.log('Bot is executing!');
@@ -127,22 +135,26 @@ client.on('guildMemberAdd', async (member) => {
   console.log('New member in discord');
 });
 
-client.on('guildMemberUpdate', async (member) => {
-  await discordToDB();
-  const generalChat = client.channels.cache.find((channel) => channel.id === '734182168213061723');
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+  try {
+    await discordToDB();
+    const generalChat = client.channels.cache.find((channel) => channel.id === '662888155501821956');
 
-  if (newMember instanceof Discord.GuildMember && newMember) {
-    const clover = newMember.roles.cache.find((role) => role.id === '734123118402076672');
-    const cloverHS = newMember.roles.cache.find((role) => role.id === '734123385940082698');
-    const cloverUR = newMember.roles.cache.find((role) => role.id === '735107783900528751');
+    const roleFound = await awaitRole(newMember.roles.cache, (role) => {
+      if (role.id === '734123118402076672' || role.id === '734123385940082698' || role.id === '735107783900528751') {
+        return role;
+      }
+      return 0;
+    });
 
-    if (clover || cloverHS || cloverUR) {
-      generalChat.send(`@${clover.name} Send a warm welcome to our new member ${member.username ? member.username : member.nickname}`);
+    if (roleFound.length) {
+      return generalChat.send(`<@&${roleFound[0].id}> Send a warm welcome to our new member <@${newMember.id}>`);
     }
-  }
 
-  newMember = 0;
-  console.log('Discord member was updated');
+    console.log('Discord member was updated');
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 client.on('message', async (message) => {

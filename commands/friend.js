@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const { slides } = require('googleapis/build/src/apis/slides');
 const db = require('../models/index');
 
 module.exports = {
@@ -94,7 +95,10 @@ module.exports = {
         // FIND USER FRIENDCODE BY DISCORDID
         if (discordId.test(args[0])) {
           try {
-            const found = await db.Member.findOne({ where: { discordId: args[0] } });
+            let sliced = args[0];
+            sliced = sliced.slice(3, sliced.length - 1);
+            const found = await db.Member.findOne({ where: { discordId: sliced } });
+
             if (found) {
               const { name, guild, friendCode } = found;
               return message.channel.send(`The friend code of \`${name}\` from \`${JSON.parse(guild)[0]}\` is \`${friendCode || 'not set'}\`.`);

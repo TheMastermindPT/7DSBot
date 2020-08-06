@@ -3,6 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 const moment = require('moment');
+const { isArray } = require('util');
 const db = require('./models/index');
 const { update } = require('./essentials/auth');
 
@@ -103,7 +104,7 @@ const discordToDB = async () => {
     }
   }
 
-  return 0;
+  return members;
 };
 
 for (const file of commandFiles) {
@@ -121,10 +122,59 @@ const awaitRole = async (collection, predicate) => {
 };
 
 client.on('ready', async () => {
-  await discordToDB();
-  // Update db must be in same order as updatesheet
-  // await update('gb', 'CloverHS', 'sheet');
-  return console.log('Bot is executing!');
+  try {
+    const members = await discordToDB();
+    const guild = client.guilds.cache.get('662888155501821953');
+    const category = guild.channels.cache.find((c) => c.id === '734907156410663084');
+    if (!category) throw new Error('Category channel does not exist');
+
+    const clover = guild.channels.cache.find((c) => c.id === '741046564528717947');
+    const cloverHS = guild.channels.cache.find((c) => c.id === '741046688252297256');
+    const cloverUR = guild.channels.cache.find((c) => c.id === '741046764706070649');
+
+    let main = 0;
+    let hs = 0;
+    let ur = 0;
+
+    for await (const member of members) {
+      if (Object.keys(member).length) {
+        const roles = member.roles.cache;
+
+        for (const [index, role] of roles) {
+          switch (role.id) {
+            case '734123118402076672':
+              // if (member.nickname) {
+              //   console.log(`Nick: ${member.nickname}`);
+              // } else {
+              //   console.log(`username: ${member.user.username}`);
+              // }
+              main++;
+              break;
+            case '734123385940082698':
+              hs++;
+              break;
+            case '735107783900528751':
+              ur++;
+              break;
+            default:
+              break;
+          }
+        }
+      }
+
+      // console.log(`Main : ${main} / HS : ${hs} / UR: ${ur}`);
+    }
+
+    clover.edit({ name: `Clovers: ${main}` });
+    cloverHS.edit({ name: `CloversHS: ${hs}` });
+    cloverUR.edit({ name: `CloversUR: ${ur}` });
+
+    // Update db must be in same order as updatesheet
+    // await update('gb', 'CloverHS', 'sheet');
+    return console.log('Bot is executing!');
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 // Create an event listener for new guild members

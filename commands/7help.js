@@ -8,7 +8,7 @@ module.exports = {
         `
         List of commands:
         !friend set [friendcode] = Saves your code on a database.
-        !friend [discordid] = Search for this user and retrieves his friend code.
+        !friend [@mention] = Search for this user and retrieves his friend code.
         !friend all = An embed with all the friend codes.
         `,
       );
@@ -19,6 +19,7 @@ module.exports = {
         `
         List of commands:
         !friend [discordid] = Search for this user and retrieves his friend code.
+        !friend [@mention] = Search for this user and retrieves his friend code.
         !friend all = An embed with all the friend codes.
         `,
       );
@@ -33,7 +34,7 @@ module.exports = {
           !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
           !gear type : Lets you know the arguments for the specific gear type.
           !friend set [friendcode] = Saves your code on a database.
-          !friend [discordid] = Search for this user and retrieves his friend code.
+          !friend [@mention] = Search for this user and retrieves his friend code.
           !friend all = An embed with all the friend codes.
           !clover sheet[op] = [op] (cp/gb/az) Sorts spreedsheet according to the option inputted. (Leaders only)  
           `,
@@ -48,7 +49,7 @@ module.exports = {
       !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
       !gear type : Lets you know the arguments for the specific gear type.
       !friend set [friendcode] = Saves your code on a database.
-      !friend [discordid] = Search for this user and retrieves his friend code.
+      !friend [@mention] = Search for this user and retrieves his friend code.
       !friend all = An embed with all the friend codes.
       `,
     );

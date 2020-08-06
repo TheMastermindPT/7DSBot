@@ -19,6 +19,12 @@ module.exports = {
               const friendCode = args[1];
               messageUser.friendCode = friendCode;
 
+              await db.Member.update({ friendCode: args[1] }, {
+                where: {
+                  discordId: messageUser.discordId,
+                },
+              });
+
               return message.channel.send(`Congratulations \`${messageUser.name}\` from \`${JSON.parse(messageUser.guild)[0]}\`. Your friend code has been set!`);
             }
             return message.channel.send('This is not a valid friend code!');

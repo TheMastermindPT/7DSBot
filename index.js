@@ -14,6 +14,88 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
+const addMembersFromDiscordToDb = async (membersArray) => {
+  try {
+    const clovers = membersArray.map((member) => {
+      if (member.user) {
+        const { user, nickname } = member;
+        const name = member.user.username;
+        const guild = [user];
+
+        if (nickname) {
+          guild[0].nick = nickname;
+        }
+
+        if (member._roles) {
+          const { _roles } = member;
+          for (const role of _roles) {
+            switch (role) {
+              case '734392418203598930':
+                guild.push('Friends of Guild');
+                break;
+              case '735107783900528751':
+                guild.push('CloverUR');
+                break;
+              case '734123385940082698':
+                guild.push('CloverHS');
+                break;
+              case '734123118402076672':
+                guild.push('Clover');
+                break;
+              default:
+                break;
+            }
+          }
+          return guild;
+        }
+      }
+      return [];
+    });
+
+    // Add member or update to DB from Discord
+    for await (const member of clovers) {
+      if (member.length) {
+        let name = '';
+
+        if (member[0].nick) {
+          name = member[0].nick.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
+        } else {
+          name = member[0].username.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
+        }
+        // eslint-disable-next-line prefer-const
+        let [{ id }, ...guild] = member;
+        guild.sort();
+        const guildJSON = JSON.stringify(guild);
+
+        try {
+          // Creates or updates user if it belongs to one of the guilds or friends of Guild
+          if (JSON.parse(guildJSON).length) {
+            const [user, created] = await db.Member.findOrCreate({
+              where: { discordId: id },
+              defaults: {
+                name,
+                guild: guildJSON,
+                discordId: id,
+              },
+            });
+
+            if (!created) {
+              db.Member.update(
+                { name, guild: guildJSON }, { where: { discordId: id } },
+              );
+            }
+          }
+        } catch (err) {
+          return console.error(err);
+        }
+      }
+    }
+    return clovers;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 const discordToDB = async () => {
   const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
   const members = cloverDiscord.members.cache.map((member) => {
@@ -22,89 +104,55 @@ const discordToDB = async () => {
     }
     return {};
   });
+  const clovers = addMembersFromDiscordToDb(members);
+  return members;
+};
 
-  const clovers = members.map((member) => {
-    if (member.user) {
-      const { user, nickname } = member;
-      const name = member.user.username;
-      const guild = [user];
+const membersCount = async (membersArray) => {
+  const guild = client.guilds.cache.get('662888155501821953');
+  const category = guild.channels.cache.find((c) => c.id === '734907156410663084');
+  if (!category) throw new Error('Category channel does not exist');
 
-      if (nickname) {
-        guild[0].nick = nickname;
-      }
+  const clover = guild.channels.cache.find((c) => c.id === '741046564528717947');
+  const cloverHS = guild.channels.cache.find((c) => c.id === '741046688252297256');
+  const cloverUR = guild.channels.cache.find((c) => c.id === '741046764706070649');
 
-      if (member._roles) {
-        const { _roles } = member;
-        for (const role of _roles) {
-          switch (role) {
-            case '734392418203598930':
-              guild.push('Friends of Guild');
-              break;
-            case '735107783900528751':
-              guild.push('CloverUR');
-              break;
-            case '734123385940082698':
-              guild.push('CloverHS');
-              break;
-            case '734123118402076672':
-              guild.push('Clover');
-              break;
-            default:
-              break;
-          }
+  let main = 0;
+  let hs = 0;
+  let ur = 0;
+
+  for await (const member of membersArray) {
+    if (Object.keys(member).length) {
+      const roles = member.roles.cache;
+
+      for (const [index, role] of roles) {
+        switch (role.id) {
+          case '734123118402076672':
+            // if (member.nickname) {
+            //   console.log(`Nick: ${member.nickname}`);
+            // } else {
+            //   console.log(`username: ${member.user.username}`);
+            // }
+            main++;
+            break;
+          case '734123385940082698':
+            hs++;
+            break;
+          case '735107783900528751':
+            ur++;
+            break;
+          default:
+            break;
         }
-        return guild;
       }
     }
-    return [];
-  });
 
-  // Add member or update to DB from Discord
-  for await (const member of clovers) {
-    if (member.length) {
-      let name = '';
-
-      if (member[0].nick) {
-        name = member[0].nick.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
-      } else {
-        name = member[0].username.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
-      }
-      // eslint-disable-next-line prefer-const
-      let [{ id }, ...guild] = member;
-      guild.sort();
-      const guildJSON = JSON.stringify(guild);
-
-      try {
-        // Creates or updates user if it belongs to one of the guilds or friends of Guild
-        if (JSON.parse(guildJSON).length) {
-          const [user, created] = await db.Member.findOrCreate({
-            where: { discordId: id },
-            defaults: {
-              name,
-              guild: guildJSON,
-              discordId: id,
-            },
-          });
-
-          if (!created) {
-            db.Member.update(
-              { name, guild: guildJSON }, { where: { discordId: id } },
-            );
-          }
-        } else {
-          db.Member.destroy({
-            where: {
-              discordId: id,
-            },
-          });
-        }
-      } catch (err) {
-        return console.error(err);
-      }
-    }
+    // console.log(`Main : ${main} / HS : ${hs} / UR: ${ur}`);
   }
 
-  return members;
+  clover.edit({ name: `Clovers: ${main}` });
+  cloverHS.edit({ name: `CloversHS: ${hs}` });
+  cloverUR.edit({ name: `CloversUR: ${ur}` });
 };
 
 for (const file of commandFiles) {
@@ -124,53 +172,9 @@ const awaitRole = async (collection, predicate) => {
 client.on('ready', async () => {
   try {
     const members = await discordToDB();
-    const guild = client.guilds.cache.get('662888155501821953');
-    const category = guild.channels.cache.find((c) => c.id === '734907156410663084');
-    if (!category) throw new Error('Category channel does not exist');
-
-    const clover = guild.channels.cache.find((c) => c.id === '741046564528717947');
-    const cloverHS = guild.channels.cache.find((c) => c.id === '741046688252297256');
-    const cloverUR = guild.channels.cache.find((c) => c.id === '741046764706070649');
-
-    let main = 0;
-    let hs = 0;
-    let ur = 0;
-
-    for await (const member of members) {
-      if (Object.keys(member).length) {
-        const roles = member.roles.cache;
-
-        for (const [index, role] of roles) {
-          switch (role.id) {
-            case '734123118402076672':
-              // if (member.nickname) {
-              //   console.log(`Nick: ${member.nickname}`);
-              // } else {
-              //   console.log(`username: ${member.user.username}`);
-              // }
-              main++;
-              break;
-            case '734123385940082698':
-              hs++;
-              break;
-            case '735107783900528751':
-              ur++;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-
-      // console.log(`Main : ${main} / HS : ${hs} / UR: ${ur}`);
-    }
-
-    clover.edit({ name: `Clovers: ${main}` });
-    cloverHS.edit({ name: `CloversHS: ${hs}` });
-    cloverUR.edit({ name: `CloversUR: ${ur}` });
-
     // Update db must be in same order as updatesheet
     // await update('gb', 'CloverHS', 'sheet');
+    membersCount(members);
     return console.log('Bot is executing!');
   } catch (err) {
     console.error(err);
@@ -187,7 +191,8 @@ client.on('guildMemberAdd', async (member) => {
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   try {
-    await discordToDB();
+    const members = await discordToDB();
+    membersCount(members);
 
     // TEST CHANNEL
     const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
@@ -207,9 +212,21 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     if (guildRole.length) {
       const found = oldRoles.find((role) => role.id === guildRole[0].id);
 
+      const guildRolesNames = [];
+
+      for (const [index, role] of newRoles) {
+        const some = guildRoles.some((value) => value === role.id);
+        if (some) {
+          guildRolesNames.push(role.name);
+        }
+      }
+
+      db.Member.update({ guild: JSON.stringify(guildRolesNames) }, { where: { discordId: newMember.id } });
+
       if (!found) {
         return welcomeChannel.send(`A warm welcome to our new member <@${newMember.id}> that just joined \`${guildRole[0].name}\``);
       }
+
       return welcomeChannel.send(`Our member <@${newMember.id}> just left \`${guildRole[0].name}\``);
     }
 
@@ -217,6 +234,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
   } catch (err) {
     console.error(err);
   }
+  return 0;
 });
 
 client.on('message', async (message) => {

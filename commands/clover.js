@@ -26,7 +26,6 @@ module.exports = {
         if (args[0] === 'test') {
           console.log(moment(message.member.joinedAt).format('DD-MM-YYYY'));
           console.log(moment(message.createdAt));
-          console.log();
         }
         // NEED UPDATE FUCNTION HERE TO WORK
         // Fikpik and Tugalife ID

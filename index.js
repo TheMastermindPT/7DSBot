@@ -66,7 +66,6 @@ const addMembersFromDiscordToDb = async (membersArray) => {
         let [{ id }, ...guild] = member;
         guild.sort();
         const guildJSON = JSON.stringify(guild);
-        console.log(guildJSON);
         // Creates or updates user if it belongs to one of the guilds or friends of Guild
         if (JSON.parse(guildJSON).length) {
           const [user, created] = await db.Member.findOrCreate({

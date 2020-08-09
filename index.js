@@ -2,12 +2,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
-const moment = require('moment');
-const { isArray } = require('util');
-const { EROFS } = require('constants');
-const { cloudbilling } = require('googleapis/build/src/apis/cloudbilling');
 const db = require('./models/index');
-const { update } = require('./essentials/auth');
 
 // VARIABLES //
 const { PREFIX, TOKEN } = process.env;
@@ -38,9 +33,6 @@ const addMembersFromDiscordToDb = async (membersArray) => {
           const { _roles } = member;
           for (const role of _roles) {
             switch (role) {
-              case '734392418203598930':
-                guild.push('Friends of Guild');
-                break;
               case '735107783900528751':
                 guild.push('CloverUR');
                 break;
@@ -151,6 +143,7 @@ const membersCount = (membersArray) => {
     }
   }
 
+  // Not updating in real time dont know why //
   clover.edit({ name: `Clovers: ${main}` });
   cloverHS.edit({ name: `CloversHS: ${hs}` });
   cloverUR.edit({ name: `CloversUR: ${ur}` });
@@ -181,7 +174,6 @@ client.on('ready', async () => {
 // Create an event listener for new guild members
 client.on('guildMemberAdd', async (member) => {
   await discordToDB();
-  console.log(member);
   console.log('New member in discord');
 });
 
@@ -189,7 +181,7 @@ client.on('guildMemberRemove', async (member) => {
   try {
     const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
     const found = await db.Member.findAll({ where: { discordId: member.id } });
-    if (!found.length) return new Error('The found object is empty');
+    if (!found.length) throw new Error('The found object is empty');
     await db.Member.destroy({ where: { discordId: member.id } });
     console.log(`The member ${member.user.username} was kicked from the server`);
     return welcomeChannel.send(`Our member <@${member.id}> was kicked from the server`);

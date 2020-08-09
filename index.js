@@ -66,27 +66,25 @@ const addMembersFromDiscordToDb = async (membersArray) => {
         let [{ id }, ...guild] = member;
         guild.sort();
         const guildJSON = JSON.stringify(guild);
+        console.log(guildJSON);
+        // Creates or updates user if it belongs to one of the guilds or friends of Guild
+        if (JSON.parse(guildJSON).length) {
+          const [user, created] = await db.Member.findOrCreate({
+            where: { discordId: id },
+            defaults: {
+              name,
+              guild: guildJSON,
+              discordId: id,
+            },
+          });
 
-        try {
-          // Creates or updates user if it belongs to one of the guilds or friends of Guild
-          if (JSON.parse(guildJSON).length) {
-            const [user, created] = await db.Member.findOrCreate({
-              where: { discordId: id },
-              defaults: {
-                name,
-                guild: guildJSON,
-                discordId: id,
-              },
-            });
-
-            if (!created) {
-              db.Member.update(
-                { name, guild: guildJSON }, { where: { discordId: id } },
-              );
-            }
+          if (!created) {
+            db.Member.update(
+              { name, guild: guildJSON }, { where: { discordId: id } },
+            );
           }
-        } catch (err) {
-          return console.error(err);
+        } else {
+          await db.Member.destroy({ where: { discordId: id } });
         }
       }
     }

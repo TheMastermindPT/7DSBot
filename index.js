@@ -4,6 +4,8 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const moment = require('moment');
 const { isArray } = require('util');
+const { EROFS } = require('constants');
+const { cloudbilling } = require('googleapis/build/src/apis/cloudbilling');
 const db = require('./models/index');
 const { update } = require('./essentials/auth');
 
@@ -13,6 +15,12 @@ const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
+const guildRoles = ['734123118402076672', '734123385940082698', '735107783900528751'];
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
+}
 
 const addMembersFromDiscordToDb = async (membersArray) => {
   try {
@@ -108,7 +116,7 @@ const discordToDB = async () => {
   return members;
 };
 
-const membersCount = async (membersArray) => {
+const membersCount = (membersArray) => {
   const guild = client.guilds.cache.get('662888155501821953');
   const category = guild.channels.cache.find((c) => c.id === '734907156410663084');
   if (!category) throw new Error('Category channel does not exist');
@@ -121,18 +129,13 @@ const membersCount = async (membersArray) => {
   let hs = 0;
   let ur = 0;
 
-  for await (const member of membersArray) {
+  for (const member of membersArray) {
     if (Object.keys(member).length) {
       const roles = member.roles.cache;
 
       for (const [index, role] of roles) {
         switch (role.id) {
           case '734123118402076672':
-            // if (member.nickname) {
-            //   console.log(`Nick: ${member.nickname}`);
-            // } else {
-            //   console.log(`username: ${member.user.username}`);
-            // }
             main++;
             break;
           case '734123385940082698':
@@ -146,19 +149,12 @@ const membersCount = async (membersArray) => {
         }
       }
     }
-
-    // console.log(`Main : ${main} / HS : ${hs} / UR: ${ur}`);
   }
 
   clover.edit({ name: `Clovers: ${main}` });
   cloverHS.edit({ name: `CloversHS: ${hs}` });
   cloverUR.edit({ name: `CloversUR: ${ur}` });
 };
-
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.name, command);
-}
 
 const awaitRole = async (collection, predicate) => {
   try {
@@ -173,34 +169,47 @@ client.on('ready', async () => {
   try {
     const members = await discordToDB();
     // Update db must be in same order as updatesheet
-    // await update('gb', 'CloverHS', 'sheet');
+    // await update('cp', 'CloverHS', 'sheet');
     membersCount(members);
     return console.log('Bot is executing!');
   } catch (err) {
     console.error(err);
   }
+  return 0;
 });
 
 // Create an event listener for new guild members
 client.on('guildMemberAdd', async (member) => {
   await discordToDB();
-  newMember = member;
   console.log(member);
   console.log('New member in discord');
+});
+
+client.on('guildMemberRemove', async (member) => {
+  try {
+    const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
+    const found = await db.Member.findAll({ where: { discordId: member.id } });
+    if (!found.length) return new Error('The found object is empty');
+    await db.Member.destroy({ where: { discordId: member.id } });
+    console.log(`The member ${member.user.username} was kicked from the server`);
+    return welcomeChannel.send(`Our member <@${member.id}> was kicked from the server`);
+  } catch (err) {
+    console.error(err);
+  }
+  return '';
 });
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
   try {
     const members = await discordToDB();
     membersCount(members);
+    console.log('Discord member was updated');
 
     // TEST CHANNEL
-    const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
-    const guildRoles = ['734123118402076672', '734123385940082698', '735107783900528751'];
-
     const newRoles = newMember.roles.cache;
     const oldRoles = oldMember.roles.cache;
     const diff = oldRoles.difference(newRoles);
+    const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
 
     const guildRole = await awaitRole(diff, (role) => {
       const some = guildRoles.some((value) => value === role.id);
@@ -229,8 +238,6 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 
       return welcomeChannel.send(`Our member <@${newMember.id}> just left \`${guildRole[0].name}\``);
     }
-
-    console.log('Discord member was updated');
   } catch (err) {
     console.error(err);
   }

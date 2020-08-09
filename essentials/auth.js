@@ -23,6 +23,7 @@ const daysColumns = ['B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
 const pushStats = async (sheet, guildArray) => {
   try {
+    if (!guildArray.length || guildArray.length > 30) throw new Error('Guild members length is not an accceptable value');
     const stats = { weeks: [] };
     let strikes;
     const members = await Promise.all(guildArray.map(async (member, index) => {
@@ -196,6 +197,7 @@ const membersArray = async (sort, guild) => {
 const updateSheet = async (sheet, array) => {
   try {
     // Logs into sheet, pulls members from DB, turns object clover into array
+    if (!array.length || array.length > 30) throw new Error('Guild members length is not an accceptable value');
     const weekHeader = await sheet.getCellByA1('B1');
     const guild = Object.entries(array);
     weekHeader.value = `${monthS} ${startWeek.format('D')}th-${endWeek.format('D')}th`;

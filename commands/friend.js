@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const { slides } = require('googleapis/build/src/apis/slides');
 const db = require('../models/index');
 
 module.exports = {
@@ -17,10 +16,11 @@ module.exports = {
           if (args[0] === 'set') {
             if (regex.test(args[1])) {
               const messageUser = users.find((member) => member.discordId === message.member.id);
-              const friendCode = args[1];
+              const sliced = new RegExp(/^\d{9}$/, 'i');
+              const friendCode = args[1].match(sliced);
               messageUser.friendCode = friendCode;
 
-              await db.Member.update({ friendCode: args[1] }, {
+              await db.Member.update({ friendCode: sliced[0] }, {
                 where: {
                   discordId: messageUser.discordId,
                 },
@@ -95,8 +95,9 @@ module.exports = {
         // FIND USER FRIENDCODE BY DISCORDID
         if (discordId.test(args[0])) {
           try {
-            let sliced = args[0];
-            sliced = sliced.slice(3, sliced.length - 1);
+            let sliced = new RegExp(/\d{18}/, 'i');
+            // issue with mobile users
+            sliced = args[0].match(sliced);
             const found = await db.Member.findOne({ where: { discordId: sliced } });
 
             if (found) {

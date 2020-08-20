@@ -281,5 +281,5 @@ const update = async (sort, guild, callback) => {
 };
 
 module.exports = {
-  dayN, monthN, monthS, update, getWeek,
+  dayN, monthN, monthS, update, getWeek, membersArray,
 };

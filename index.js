@@ -181,7 +181,7 @@ client.on('guildMemberRemove', async (member) => {
     if (!found.length) throw new Error('The found object is empty');
     await db.Member.destroy({ where: { discordId: member.id } });
     console.log(`The member ${member.user.username} was kicked from the server`);
-    return welcomeChannel.send(`Our member <@${member.id}> was kicked from the server`);
+    return welcomeChannel.send(`Our member <@${member.id}> left or was kicked from the server`);
   } catch (err) {
     console.error(err);
   }

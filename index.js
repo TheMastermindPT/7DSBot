@@ -235,24 +235,26 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 });
 
 client.on('message', async (message) => {
-  if (MENTIONABLE.test(message.content)) {
-    const mentionUserId = message.content.match(MENTIONABLE)[2];
-    const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
-    const mentionedUserRoles = memberMentioned.roles.cache;
-    const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
-
-    // I need to save to database pictures for different induras
-    if (memberHasInduraRole) return message.channel.send('', { files: ['https://imgur.com/MloN5vu.jpg'] });
-  }
-
-  if (!message.content.startsWith(PREFIX) || message.author.bot) return;
-
-  const args = message.content.slice(PREFIX.length).split(/ +/);
-  const command = args.shift().toLowerCase();
-
-  if (!client.commands.has(command)) return;
-
   try {
+    if (MENTIONABLE.test(message.content)) {
+      const mentionUserId = message.content.match(MENTIONABLE)[2];
+      const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
+      const mentionedUserRoles = memberMentioned.roles.cache;
+      const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
+
+      const mentionedUserInDB = await db.Member.findAll({ where: { discordId: mentionUserId }, include: db.Image });
+      const imageOfIndura = mentionedUserInDB[0].Images.url;
+
+      // I need to save to database pictures for different induras
+      if (memberHasInduraRole) return message.channel.send('', { files: [`${imageOfIndura}`] });
+    }
+
+    if (!message.content.startsWith(PREFIX) || message.author.bot) return;
+
+    const args = message.content.slice(PREFIX.length).split(/ +/);
+    const command = args.shift().toLowerCase();
+
+    if (!client.commands.has(command)) return;
     client.commands.get(command).execute(message, args);
   } catch (error) {
     console.error(error);

@@ -41,6 +41,11 @@ module.exports = {
       allowNull: true,
       field: 'strikes',
     },
+    indura: {
+      type: Sequelize.BOOLEAN,
+      allowNull: true,
+      field: 'indura',
+    },
     createdAt: {
       type: Sequelize.DATEONLY,
       allowNull: false,

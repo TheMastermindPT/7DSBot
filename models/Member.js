@@ -41,6 +41,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       field: 'strikes',
     },
+    indura: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      field: 'indura',
+    },
     createdAt: {
       type: DataTypes.DATEONLY,
       allowNull: false,
@@ -58,6 +63,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Member.associate = function (models) {
     Member.hasMany(models.Check, {
+      foreignKey: 'membersIdMember',
+      sourceKey: 'idMember',
+    });
+
+    Member.hasMany(models.Image, {
       foreignKey: 'membersIdMember',
       sourceKey: 'idMember',
     });

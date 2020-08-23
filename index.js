@@ -257,7 +257,7 @@ client.on('message', async (message) => {
 
       // eslint-disable-next-line max-len
       const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
-      if (!mentionedUserInDB || !mentionUserId.Images[0].length) return;
+      if (!mentionedUserInDB || !mentionedUserInDB.Images[0].length) return;
 
       const imageOfIndura = mentionedUserInDB.Images[0].url;
       if (!imageOfIndura) return;

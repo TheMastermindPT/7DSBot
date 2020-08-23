@@ -6,7 +6,7 @@ const db = require('./models/index');
 
 // VARIABLES //
 const { PREFIX, TOKEN } = process.env;
-const MENTIONABLE = /^(<@!|)(\d{18})>$/i;
+const MENTIONABLE = /(<@!|)(\d{18})>/i;
 const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();

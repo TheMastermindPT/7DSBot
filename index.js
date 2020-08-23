@@ -243,6 +243,7 @@ client.on('message', async (message) => {
       const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
 
       const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
+      if (!mentionedUserInDB) return console.log(mentionedUserInDB);
 
       const imageOfIndura = mentionedUserInDB.Images[0].url;
 

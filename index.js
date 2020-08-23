@@ -243,10 +243,11 @@ client.on('message', async (message) => {
       const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
 
       const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
-      const imageOfIndura = mentionedUserInDB[0].Images.url;
 
-      // I need to save to database pictures for different induras
-      if (memberHasInduraRole) return message.channel.send('', { files: [`${imageOfIndura}`] });
+      const imageOfIndura = mentionedUserInDB.Images[0].url;
+
+      // Maybe need to change, discord needs specified file type
+      if (memberHasInduraRole) return message.channel.send('', { files: [`${imageOfIndura}.jpg`] });
     }
 
     if (!message.content.startsWith(PREFIX) || message.author.bot) return;

@@ -34,8 +34,8 @@ module.exports = {
               db.Image.update({ url }, { where: { membersIdMember: idMember } });
               return message.channel.send('Hey `Indura`. Your picture has been set.');
             }
-          });
-        });
+          }).catch((err) => console.error(err));
+        }).catch((err) => console.error(err));
       }
     } catch (err) {
       console.error(err);

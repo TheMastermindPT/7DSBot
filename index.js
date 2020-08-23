@@ -6,6 +6,7 @@ const db = require('./models/index');
 
 // VARIABLES //
 const { PREFIX, TOKEN } = process.env;
+const MENTIONABLE = /^(<@!|)(\d{18})>$/i;
 const guildID = '662888155501821953';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -234,8 +235,14 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 });
 
 client.on('message', async (message) => {
-  if (message.content === '<@&734127338576412705>') {
-    message.channel.send('', { files: ['https://imgur.com/MloN5vu.jpg'] });
+  if (MENTIONABLE.test(message.content)) {
+    const mentionUserId = message.content.match(MENTIONABLE)[2];
+    const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
+    const mentionedUserRoles = memberMentioned.roles.cache;
+    const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
+
+    // I need to save to database pictures for different induras
+    if (memberHasInduraRole) return message.channel.send('', { files: ['https://imgur.com/MloN5vu.jpg'] });
   }
 
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;

@@ -257,12 +257,12 @@ client.on('message', async (message) => {
 
       // eslint-disable-next-line max-len
       const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
-      if (!mentionedUserInDB || !mentionedUserInDB.Images[0].length) return;
+      if (!mentionedUserInDB || !memberHasInduraRole) return;
+
+      if (!mentionedUserInDB.Images[0].url.length) return;
 
       const imageOfIndura = mentionedUserInDB.Images[0].url;
       if (!imageOfIndura) return;
-
-      if (!memberHasInduraRole) return;
 
       const regex = /(.jpg|.png|.gif|.jpeg)$/i;
       if (regex.test(imageOfIndura)) return message.channel.send('', { files: [`${imageOfIndura}`] });

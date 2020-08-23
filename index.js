@@ -251,6 +251,7 @@ client.on('message', async (message) => {
   try {
     if (MENTIONABLE.test(message.content)) {
       const mentionUserId = message.content.match(MENTIONABLE)[2];
+      if (!mentionUserId[2]) return;
       const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
       const mentionedUserRoles = memberMentioned.roles.cache;
       const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');

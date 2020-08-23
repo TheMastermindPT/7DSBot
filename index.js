@@ -262,6 +262,8 @@ client.on('message', async (message) => {
       const imageOfIndura = mentionedUserInDB.Images[0].url;
       if (!imageOfIndura) return;
 
+      if (!memberHasInduraRole) return;
+
       const regex = /(.jpg|.png|.gif|.jpeg)$/i;
       if (regex.test(imageOfIndura)) return message.channel.send('', { files: [`${imageOfIndura}`] });
 

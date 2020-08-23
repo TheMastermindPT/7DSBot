@@ -2,6 +2,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
+const { urlshortener_v1 } = require('googleapis');
 const db = require('./models/index');
 
 // VARIABLES //
@@ -251,19 +252,17 @@ client.on('message', async (message) => {
   try {
     if (MENTIONABLE.test(message.content)) {
       const mentionUserId = message.content.match(MENTIONABLE)[2];
-      if (!mentionUserId[2]) return;
       const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
+      if (!memberMentioned) return;
       const mentionedUserRoles = memberMentioned.roles.cache;
       const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
 
       // eslint-disable-next-line max-len
-      const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
-      if (!mentionedUserInDB || !memberHasInduraRole) return;
+      const mentionedUserInGuild = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
 
-      if (!mentionedUserInDB.Images[0].url.length) return;
+      if (!memberHasInduraRole || !mentionedUserInGuild || !mentionedUserInGuild.Images[0].url.length) return;
 
-      const imageOfIndura = mentionedUserInDB.Images[0].url;
-      if (!imageOfIndura) return;
+      const imageOfIndura = mentionedUserInGuild.Images[0].url;
 
       const regex = /(.jpg|.png|.gif|.jpeg)$/i;
       if (regex.test(imageOfIndura)) return message.channel.send('', { files: [`${imageOfIndura}`] });
@@ -280,7 +279,6 @@ client.on('message', async (message) => {
     client.commands.get(command).execute(message, args);
   } catch (error) {
     console.error(error);
-    message.reply('There was an error trying to execute that command!');
   }
 });
 

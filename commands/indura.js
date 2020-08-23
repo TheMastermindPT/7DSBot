@@ -20,6 +20,7 @@ module.exports = {
         if (!isUrl.test(args[1])) return;
 
         db.Member.findOne({ where: { discordId: id } }).then((found) => {
+          if (!found) return;
           const { idMember } = found;
           found.update({ indura: true }, { where: { discordId: id } });
 

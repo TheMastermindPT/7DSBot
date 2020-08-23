@@ -84,7 +84,12 @@ const addMembersFromDiscordToDb = async (membersArray) => {
             );
           }
         } else {
-          await db.Member.destroy({ where: { discordId: id } });
+          const userInDatabase = await db.Member.findOne({ where: { discordId: id } });
+          if (userInDatabase) {
+            await db.Check.destroy({ where: { membersIdMember: userInDatabase.idMember } });
+            await db.Image.destroy({ where: { membersIdMember: userInDatabase.idMember } });
+            await db.Member.destroy({ where: { discordId: id } });
+          }
         }
       }
     }
@@ -178,9 +183,13 @@ client.on('guildMemberAdd', async (member) => {
 client.on('guildMemberRemove', async (member) => {
   try {
     const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
-    const found = await db.Member.findAll({ where: { discordId: member.id } });
+    const found = await db.Member.findOne({ where: { discordId: member.id } });
     if (!found.length) throw new Error('The found object is empty');
-    await db.Member.destroy({ where: { discordId: member.id } });
+
+    await db.Check.destroy({ where: { membersIdMember: found.idMember } });
+    await db.Image.destroy({ where: { membersIdMember: found.idMember } });
+    await db.Member.destroy(found);
+
     console.log(`The member ${member.user.username} was kicked from the server`);
     return welcomeChannel.send(`Our member <@${member.id}> left or was kicked from the server`);
   } catch (err) {
@@ -220,12 +229,16 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
         }
       }
 
-      db.Member.update({ guild: JSON.stringify(guildRolesNames) }, { where: { discordId: newMember.id } });
+      db.Member.update({ guild: JSON.stringify(guildRolesNames) },
+        { where: { discordId: newMember.id } });
 
       if (!found) {
         return welcomeChannel.send(`A warm welcome to our new member <@${newMember.id}> that just joined \`${guildRole[0].name}\``);
       }
 
+      const user = await db.Member.findOne({ where: { discordId: newMember.id } });
+      db.Check.destroy({ where: { membersIdMember: user.idMember } });
+      db.Image.destroy({ where: { membersIdMember: user.idMember } });
       return welcomeChannel.send(`Our member <@${newMember.id}> just left \`${guildRole[0].name}\``);
     }
   } catch (err) {
@@ -242,13 +255,17 @@ client.on('message', async (message) => {
       const mentionedUserRoles = memberMentioned.roles.cache;
       const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
 
+      // eslint-disable-next-line max-len
       const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
       if (!mentionedUserInDB) return console.log(mentionedUserInDB);
 
       const imageOfIndura = mentionedUserInDB.Images[0].url;
+      if (!imageOfIndura) return;
 
-      // Maybe need to change, discord needs specified file type
-      if (memberHasInduraRole) return message.channel.send('', { files: [`${imageOfIndura}.jpg`] });
+      const regex = /(.jpg|.png|.gif|.jpeg)$/i;
+      if (regex.test(imageOfIndura)) return message.channel.send('', { files: [`${imageOfIndura}`] });
+
+      return message.channel.send('', { files: [`${imageOfIndura}.gif`] });
     }
 
     if (!message.content.startsWith(PREFIX) || message.author.bot) return;

@@ -260,7 +260,7 @@ client.on('message', async (message) => {
       // eslint-disable-next-line max-len
       const mentionedUserInGuild = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
 
-      if (!memberHasInduraRole || !mentionedUserInGuild || !mentionedUserInGuild.Images[0].url.length) return;
+      if (!memberHasInduraRole || !mentionedUserInGuild || !mentionedUserInGuild.Images) return;
 
       const imageOfIndura = mentionedUserInGuild.Images[0].url;
 

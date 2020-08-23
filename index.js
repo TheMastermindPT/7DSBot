@@ -242,7 +242,7 @@ client.on('message', async (message) => {
       const mentionedUserRoles = memberMentioned.roles.cache;
       const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
 
-      const mentionedUserInDB = await db.Member.findAll({ where: { discordId: mentionUserId }, include: db.Image });
+      const mentionedUserInDB = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
       const imageOfIndura = mentionedUserInDB[0].Images.url;
 
       // I need to save to database pictures for different induras

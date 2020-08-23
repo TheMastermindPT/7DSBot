@@ -5,7 +5,7 @@ const jokes = fs.readFileSync('jokes.txt').toString().split('\n');
 // { joke: ] }
 module.exports = {
   name: 'insult',
-  description: 'List of commands for 7DSPatchBot',
+  description: 'Randomizes a joke and insults the person mentioned',
   execute(message, args) {
     const regex = /^<@(!|)\d{18}>$/i;
     if (regex.test(args[0])) {

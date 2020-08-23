@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true,
     },
-    membersidMember: {
+    membersIdMember: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       references: {

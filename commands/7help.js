@@ -51,6 +51,7 @@ module.exports = {
       !friend set [friendcode] = Saves your code on a database.
       !friend [@mention] = Search for this user and retrieves his friend code.
       !friend all = An embed with all the friend codes.
+      !indura set [linktoimage] = Only available to induras. Saves a picture to the database.
       `,
     );
   },

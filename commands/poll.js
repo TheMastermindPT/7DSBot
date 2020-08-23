@@ -3,7 +3,7 @@ const { questions } = require('./pollquestions.js');
 
 module.exports = {
   name: 'poll',
-  description: 'List of commands for 7DSPatchBot',
+  description: 'Poll for guild leadership roles',
   execute(message, args) {
     (async function initPoll() {
       try {

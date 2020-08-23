@@ -234,12 +234,17 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 });
 
 client.on('message', async (message) => {
+  if (message.content === '<@&734127338576412705>') {
+    message.channel.send('', { files: ['https://imgur.com/MloN5vu.jpg'] });
+  }
+
   if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
   const args = message.content.slice(PREFIX.length).split(/ +/);
   const command = args.shift().toLowerCase();
 
   if (!client.commands.has(command)) return;
+
   try {
     client.commands.get(command).execute(message, args);
   } catch (error) {

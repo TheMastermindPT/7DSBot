@@ -250,7 +250,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 
 client.on('message', async (message) => {
   try {
-    if (MENTIONABLE.test(message.content)) {
+    if (!message.content.startsWith(PREFIX) && MENTIONABLE.test(message.content)) {
       const mentionUserId = message.content.match(MENTIONABLE)[2];
       const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
       if (!memberMentioned) return;

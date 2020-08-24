@@ -2,7 +2,6 @@ const fs = require('fs');
 
 const jokes = fs.readFileSync('jokes.txt').toString().split('\n');
 
-// { joke: ] }
 module.exports = {
   name: 'insult',
   description: 'Randomizes a joke and insults the person mentioned',

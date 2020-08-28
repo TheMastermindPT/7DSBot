@@ -55,7 +55,7 @@ module.exports = {
               if (reply.content.length < 2) {
                 counter = 0;
                 collector.stop();
-                return channel.send('Answer was too short.');
+                return channel.send('Answer was too short. The poll was cancelled.');
               }
 
               return true;

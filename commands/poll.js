@@ -92,11 +92,11 @@ module.exports = {
                 answers,
               },
               where: {
-                membersidMember: userOnDB.idMember,
+                membersIdMember: userOnDB.idMember,
               },
             }).then((created) => {
               if (!created) {
-                db.Poll.update({ answers }, { where: { membersidMember: userOnDB.idMember } });
+                db.Poll.update({ answers }, { where: { membersIdMember: userOnDB.idMember } });
               }
             });
           }).catch((err) => console.error(err));

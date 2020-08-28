@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('polls', {
-    idimages: {
+    idPolls: {
       autoIncrement: true,
       type: Sequelize.INTEGER(11),
       allowNull: false,

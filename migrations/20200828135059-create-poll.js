@@ -1,0 +1,33 @@
+module.exports = {
+  up: (queryInterface, Sequelize) => queryInterface.createTable('polls', {
+    idimages: {
+      autoIncrement: true,
+      type: Sequelize.INTEGER(11),
+      allowNull: false,
+      primaryKey: true,
+    },
+    membersIdMember: {
+      type: Sequelize.INTEGER(11),
+      allowNull: false,
+      references: {
+        model: {
+          tableName: 'members',
+        },
+        key: 'idMember',
+      },
+    },
+    answers: {
+      type: Sequelize.JSON,
+      allowNull: false,
+    },
+    createdAt: {
+      type: Sequelize.DATEONLY,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: Sequelize.DATEONLY,
+      allowNull: true,
+    },
+  }),
+  down: (queryInterface, Sequelize) => queryInterface.dropTable('polls'),
+};

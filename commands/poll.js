@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const { questions } = require('./pollquestions.js');
+const db = require('../models/index.js');
 
 module.exports = {
   name: 'poll',
@@ -25,13 +26,14 @@ module.exports = {
           if (m.author.id === '728247266812624916' || m.author.id === id) {
             return m;
           }
-        }, { max: 18, time: 10000, errors: ['time'] });
+        }, { max: 18, time: 20000, errors: ['time'] });
 
         let counter = 1;
-        collector.on('collect', (reply) => {
+
+        collector.on('collect', function (reply) {
+          const userMessages = channel.messages.cache.find((m) => m.author.id === id);
           const botEmbed = channel.messages.cache.find((m) => m.author.id === '728247266812624916');
-          collector.dispose(botEmbed);
-          // const userMessages = channel.messages.cache.find((m) => m.author.id === id);
+          this.dispose(botEmbed);
           if (reply.author.id === id && !reply.author.bot) {
             channel.messages.delete(botEmbed);
             if (counter >= 1 && counter <= 7) {
@@ -50,7 +52,7 @@ module.exports = {
                 counter++;
               }
 
-              if (reply.content.length <= 1) {
+              if (reply.content.length <= 2) {
                 counter = 0;
                 collector.stop();
                 return channel.send('Answer was too short.');
@@ -65,7 +67,39 @@ module.exports = {
         });
 
         collector.on('end', (collected, reason) => {
-          console.log(collected);
+          const filteredPoll = collected.filter((user) => user.author.id !== '728247266812624916');
+          let answers = [];
+
+          for (const userMessage of filteredPoll) {
+            answers.push({
+              discordId: userMessage[1].author.id,
+              username:
+              userMessage[1].author.nick
+                ? userMessage[1].author.nick
+                : userMessage[1].author.username,
+              answer: userMessage[1].content,
+            });
+          }
+
+          // console.log(answers);
+
+          db.Member.findOne({ where: { discordId: answers[0].discordId } }).then((userOnDB) => {
+            if (!userOnDB) throw new Error('No user with that discordId was found on the database');
+            answers = JSON.stringify(answers);
+            console.log(userOnDB);
+            db.Poll.findOrCreate({
+              defaults: {
+                answers,
+              },
+              where: {
+                membersidMember: userOnDB.idMember,
+              },
+            }).then((created) => {
+              if (!created) {
+                db.Poll.update({ answers }, { where: { membersidMember: userOnDB.idMember } });
+              }
+            });
+          }).catch((err) => console.error(err));
         });
 
         collector.on('dispose', (dispose) => {

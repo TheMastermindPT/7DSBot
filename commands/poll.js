@@ -80,13 +80,10 @@ module.exports = {
               answer: userMessage[1].content,
             });
           }
-
           // console.log(answers);
-
           db.Member.findOne({ where: { discordId: answers[0].discordId } }).then((userOnDB) => {
             if (!userOnDB) throw new Error('No user with that discordId was found on the database');
             answers = JSON.stringify(answers);
-            console.log(userOnDB);
             db.Poll.findOrCreate({
               defaults: {
                 answers,
@@ -96,7 +93,9 @@ module.exports = {
               },
             }).then((created) => {
               if (!created) {
-                db.Poll.update({ answers }, { where: { membersIdMember: userOnDB.idMember } });
+                db.Poll.update({ answers }, { where: { membersIdMember: userOnDB.idMember } })
+                  .then(() => console.log('A poll was updated'))
+                  .catch((err) => console.error(err));
               }
             });
           }).catch((err) => console.error(err));

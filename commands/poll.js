@@ -47,7 +47,7 @@ module.exports = {
                 collector.stop();
               }
 
-              if (counter > 0 && reply.content !== 'yes' && reply.content !== 'no') {
+              if (counter > 1 && reply.content !== 'yes' && reply.content !== 'no') {
                 channel.send(questions[counter]);
                 counter++;
               }

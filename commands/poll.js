@@ -33,10 +33,8 @@ module.exports = {
         collector.on('collect', (reply) => {
           const userMessages = channel.messages.cache.find((m) => m.author.id === id);
           const botEmbed = channel.messages.cache.find((m) => m.author.id === '728247266812624916');
-
           if (reply.author.id === id && !reply.author.bot) {
             channel.messages.delete(botEmbed);
-            channel.messages.delete(userMessages);
             if (counter >= 1 && counter <= 7) {
               collector.resetTimer({ time: 180000 });
               if (reply.content === 'yes') {
@@ -65,6 +63,7 @@ module.exports = {
             collector.stop();
             return channel.send(`\`Your application has been sent ${reply.author.username}\``);
           }
+          channel.messages.delete(userMessages);
         });
 
         collector.on('end', (collected, reason) => {
@@ -93,10 +92,12 @@ module.exports = {
                 membersIdMember: userOnDB.idMember,
               },
             }).then((created) => {
-              if (!created) {
+              if (!created[1]) {
                 db.Poll.update({ answers }, { where: { membersIdMember: userOnDB.idMember } })
                   .then(() => console.log('A poll was updated'))
                   .catch((err) => console.error(err));
+              } else {
+                console.log('A new poll was created.');
               }
             }).catch((err) => console.error(err));
           }).catch((err) => console.error(err));

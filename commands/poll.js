@@ -52,7 +52,7 @@ module.exports = {
                 counter++;
               }
 
-              if (reply.content.length <= 2) {
+              if (reply.content.length < 2) {
                 counter = 0;
                 collector.stop();
                 return channel.send('Answer was too short.');

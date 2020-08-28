@@ -97,7 +97,7 @@ module.exports = {
                   .then(() => console.log('A poll was updated'))
                   .catch((err) => console.error(err));
               }
-            });
+            }).catch((err) => console.error(err));
           }).catch((err) => console.error(err));
         });
 

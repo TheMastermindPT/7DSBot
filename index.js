@@ -2,7 +2,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
-const { urlshortener_v1 } = require('googleapis');
+const { update } = require('./essentials/auth');
 const db = require('./models/index');
 
 // VARIABLES //
@@ -174,8 +174,8 @@ client.on('ready', async () => {
   try {
     const members = await discordToDB();
     // Update db must be in same order as updatesheet
-    // await update('cp', 'CloverHS', 'sheet');
     membersCount(members);
+    await update('cp', 'CloverHS', 'db');
     return console.log('Bot is executing!');
   } catch (err) {
     console.error(err);
@@ -198,7 +198,7 @@ client.on('guildMemberRemove', async (member) => {
     await db.Check.destroy({ where: { membersIdMember: found.idMember } });
     await db.Image.destroy({ where: { membersIdMember: found.idMember } });
     await db.Member.destroy(found);
-
+    await update('cp', 'CloverHS', 'sheet');
     console.log(`The member ${member.user.username} was kicked from the server`);
     return welcomeChannel.send(`Our member <@${member.id}> left or was kicked from the server`);
   } catch (err) {
@@ -248,6 +248,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
       const user = await db.Member.findOne({ where: { discordId: newMember.id } });
       db.Check.destroy({ where: { membersIdMember: user.idMember } });
       db.Image.destroy({ where: { membersIdMember: user.idMember } });
+      await update('cp', 'CloverHS', 'sheet');
       return welcomeChannel.send(`Our member <@${newMember.id}> just left \`${guildRole[0].name}\``);
     }
   } catch (err) {

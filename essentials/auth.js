@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 // spreadsheet key is the long id in the sheets URL
-const doc = new GoogleSpreadsheet('17eFMDOTZuv9eIYI8WYVZH1CPjvr5eLLj6AilHzXEJGQ');
+const doc = new GoogleSpreadsheet('14U90Kf0T-ep08F7Gu_zRaohRx13z_L_35IvwXlhrJwM');
 const moment = require('moment');
 const auth = require('../config/client_secret.json');
 const db = require('../models/index');
@@ -80,17 +80,17 @@ const pushStats = async (sheet, guildArray) => {
 
       return member;
     }));
-
-    for (const member of members) {
-      if (member[1].strikes >= 1) {
-        strikes = member[1].strikes;
-      } else {
-        strikes = 0;
-      }
-    }
+    let nameOfPersonStriked;
 
     for await (const [index, week] of Object.entries(stats.weeks)) {
       const i = parseInt(index, 10);
+
+      // if (!members[i][1].strikes) {
+      //   strikes = 0;
+      // } else {
+      //   strikes = members[i][1].strikes;
+      // }
+
       for await (const day of week) {
         const { red, green, blue } = day;
 
@@ -121,19 +121,28 @@ const pushStats = async (sheet, guildArray) => {
           );
         }
 
+        // Strikes if it finds a red day
         if (day.red === 1) {
           strikes++;
-          console.log(`${members[i][1].name} got a strike`);
+          nameOfPersonStriked = members[i][1].name;
         }
 
-        // await db.Member.update({
-        //   strikes,
-        // }, {
-        //   where: {
-        //     idMember: members[i][1].idMember,
-        //   },
-        // });
+        // When member name changes checks for how many strikes in DB
+        if (nameOfPersonStriked !== members[i][1].name) {
+          strikes = members[i][1].strikes;
+          if (!members[i][1].strikes) {
+            strikes = 0;
+          }
+        }
       }
+
+      await db.Member.update({
+        strikes,
+      }, {
+        where: {
+          idMember: members[i][1].idMember,
+        },
+      });
     }
   } catch (error) {
     console.error(error);
@@ -197,6 +206,7 @@ const membersArray = async (sort, guild) => {
 const updateSheet = async (sheet, array) => {
   try {
     // Logs into sheet, pulls members from DB, turns object clover into array
+    console.log(array.length);
     if (!array.length || array.length > 30) throw new Error('Guild members length is not an accceptable value');
     const weekHeader = await sheet.getCellByA1('B1');
     const guild = Object.entries(array);
@@ -232,9 +242,9 @@ const updateSheet = async (sheet, array) => {
 
           if (JSON.parse(member.Checks[index].status).green === 1) {
             info.value = '✔';
-            // info.backgroundColor = {
-            //   alpha: 0, green: 1, red: 0, blue: 0,
-            // };
+            info.backgroundColor = {
+              alpha: 0, green: 1, red: 0, blue: 0,
+            };
           } else if (JSON.parse(member.Checks[index].status).red === 1) {
             info.value = dateString;
           }
@@ -254,22 +264,24 @@ const updateDB = async (sheet, array) => {
   await pushStats(sheet, guild);
 };
 
-const update = async (sort, guild, callback) => {
+const update = async (sort = null, guild, callback) => {
   try {
     const sheet = await authenticate();
-    const cloverHS = await membersArray(sort, guild);
+    const clover = await membersArray(sort, guild);
 
     if (guild && callback) {
       if (typeof callback === 'string') {
         if (callback === 'sheet') {
-          await updateSheet(sheet, cloverHS);
+          await updateSheet(sheet, clover);
+          return 0;
         }
 
         if (callback === 'db') {
-          await updateDB(sheet, cloverHS);
+          await updateDB(sheet, clover);
+          return 0;
         }
 
-        return 0;
+        throw new Error('Invalid callback.');
       }
       throw new Error('Arguments are not valid type');
     }

@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const moment = require('moment');
 const { db } = require('../models/index');
-const { monthS, membersArray } = require('../essentials/auth');
+const { monthS, membersArray, update } = require('../essentials/auth');
 
 const now = moment.now();
 const day = moment.isDate(now);
@@ -21,34 +21,31 @@ const mostGB = (a, b) => {
 };
 
 module.exports = {
-  name: 'clover',
+  name: 'guild',
   description: 'Spreadsheet functions...',
   execute(message, args) {
     (async function () {
       const guild = await membersArray('cp', 'CloverHS');
       try {
-        if (args[0] === 'test') {
-          console.log(moment(message.member.joinedAt).format('DD-MM-YYYY'));
-          console.log(moment(message.createdAt));
-        }
-        // NEED UPDATE FUCNTION HERE TO WORK
         // Fikpik and Tugalife ID
         if (message.member.id === '214429377696497665' || message.member.id === '251509011357106176') {
+          if (args[0] === 'save') {
+            await update('cp', 'CloverHS', 'db');
+            return message.channel.send('Spreadsheet values saved to the database.');
+          }
+
           if (args[0] === 'sheetcp') {
-            sort = 'cp';
-            updateSheet(sort);
+            await update('cp', 'CloverHS', 'sheet');
             return message.channel.send('Spreadsheet ordered by cp successfully.');
           }
 
           if (args[0] === 'sheetgb') {
-            sort = 'gb';
-            updateSheet(sort);
+            await update('gb', 'CloverHS', 'sheet');
             return message.channel.send('Spreadsheet ordered by gb successfully.');
           }
 
           if (args[0] === 'sheetaz') {
-            sort = 'name';
-            updateSheet(sort);
+            await update('name', 'CloverHS', 'sheet');
             return message.channel.send('Spreadsheet ordered alphabetically with success.');
           }
         }

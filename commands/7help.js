@@ -48,6 +48,7 @@ module.exports = {
       !patch: To display latest patch notes (To come).
       !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
       !gear type : Lets you know the arguments for the specific gear type.
+      !subcost [rarity] [maxvalofsub] : Gives you average cost of maxing a substat. Ex: !subcost r 4.5
       !friend set [friendcode] = Saves your code on a database.
       !friend [@mention] = Search for this user and retrieves his friend code.
       !friend all = An embed with all the friend codes.

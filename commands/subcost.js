@@ -33,10 +33,10 @@ module.exports = {
 
         const gearCost = new Discord.MessageEmbed()
           .setColor('#821d01')
-          .setTitle('How much does this substat cost?')
+          .setTitle('**Average cost to get max roll**')
           .setThumbnail('https://imgur.com/Z49j86V.jpg')
           .addFields(
-            { name: 'Cost:', value: statCost },
+            { name: '*Cost:*', value: `*${statCost}*` },
           )
           .setTimestamp();
         return message.channel.send(gearCost);

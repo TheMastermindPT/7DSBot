@@ -23,7 +23,7 @@ module.exports = {
           .addFields(
             { name: '*Atk/Def/Hp:*', value: `*${statCost3}*` },
             { name: '*C.chance/ C.Res /Lifesteal:*', value: `*${statCost45}*` },
-            { name: '*Pierce/ Res/ Cdmg/ C.Def / Recov.R / Regen.R: *', value: `*${statCost6}*` },
+            { name: '*Pierce/ Res/ Cdmg/ C.Def / Recov.R / Regen.R:*', value: `*${statCost6}*` },
           )
           .setTimestamp();
         return message.channel.send(gearCost);

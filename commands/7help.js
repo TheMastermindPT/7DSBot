@@ -32,6 +32,7 @@ module.exports = {
           List of commands:
           !patch: To display latest patch notes (To come).
           !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
+          !subcost [rarity]: Gives you average cost of maxing a substat based on the rarity of the gear. Ex: !subcost r
           !friend set [friendcode] = Saves your code on a database.
           !friend [@mention] = Search for this user and retrieves his friend code.
           !friend all = An embed with all the friend codes.
@@ -46,7 +47,7 @@ module.exports = {
       List of commands:
       !patch: To display latest patch notes (To come).
       !gear [type] [basestat] : To know if your SSR gear is good to awaken. 
-      !subcost [rarity] [maxvalofsub] : Gives you average cost of maxing a substat. Ex: !subcost r 4.5
+      !subcost [rarity]: Gives you average cost of maxing a substat based on the rarity of the gear. Ex: !subcost r
       !friend set [friendcode] = Saves your code on a database.
       !friend [@mention] = Search for this user and retrieves his friend code.
       !friend all = An embed with all the friend codes.

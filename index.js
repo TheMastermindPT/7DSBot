@@ -175,7 +175,7 @@ client.on('ready', async () => {
     const members = await discordToDB();
     // Update db must be in same order as updatesheet
     membersCount(members);
-    await update('cp', 'CloverHS', 'db');
+    // await update('cp', 'CloverHS', 'db');
     return console.log('Bot is executing!');
   } catch (err) {
     console.error(err);

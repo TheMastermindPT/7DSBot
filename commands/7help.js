@@ -36,7 +36,6 @@ module.exports = {
           !friend set [friendcode] = Saves your code on a database.
           !friend [@mention] = Search for this user and retrieves his friend code.
           !friend all = An embed with all the friend codes.
-          !clover sheet[op] = [op] (cp/gb/az) Sorts spreedsheet according to the option inputted. (Leaders only)  
           `,
         );
       }

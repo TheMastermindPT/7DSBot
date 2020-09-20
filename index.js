@@ -109,15 +109,19 @@ const addMembersFromDiscordToDb = async (membersArray) => {
 };
 
 const discordToDB = async () => {
-  const cloverDiscord = client.guilds.cache.find((guild) => guild.id === guildID);
-  const members = cloverDiscord.members.cache.map((member) => {
-    if (!member.user.bot) {
-      return member;
-    }
-    return {};
-  });
-  const clovers = addMembersFromDiscordToDb(members);
-  return members;
+  try {
+    const cloverDiscord = await client.guilds.fetch(guildID);
+    const members = cloverDiscord.members.cache.map((member) => {
+      if (!member.user.bot) {
+        return member;
+      }
+      return {};
+    });
+    addMembersFromDiscordToDb(members);
+    return members;
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const membersCount = (membersArray) => {

@@ -16,16 +16,21 @@ module.exports = {
           if (args[0] === 'set') {
             if (regex.test(args[1])) {
               const messageUser = users.find((member) => member.discordId === message.member.id);
+              if(!messageUser) throw new Error('No guild user in the database');
+              console.log(messageUser);
               const sliced = new RegExp(/^\d{9}$/, 'i');
-              const friendCode = args[1].match(sliced);
+
+              const friendCode = sliced.test(args[1]);
               messageUser.friendCode = friendCode;
 
-              await db.Member.update({ friendCode: sliced[0] }, {
-                where: {
-                  discordId: messageUser.discordId,
-                },
-              });
-
+              if(friendCode) {
+                await db.Member.update({ friendCode: args[1] }, {
+                  where: {
+                    discordId: messageUser.discordId,
+                  },
+                });
+              }
+          
               return message.channel.send(`Congratulations \`${messageUser.name}\` from \`${JSON.parse(messageUser.guild)[0]}\`. Your friend code has been set!`);
             }
             return message.channel.send('This is not a valid friend code!');

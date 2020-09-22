@@ -2,12 +2,12 @@ module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('polls', {
     idPolls: {
       autoIncrement: true,
-      type: Sequelize.UUID,
+      type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true,
     },
     membersIdMember: {
-      type: Sequelize.UUID,
+      type: Sequelize.INTEGER,
       allowNull: false,
       references: {
         model: {

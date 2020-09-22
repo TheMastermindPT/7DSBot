@@ -10,6 +10,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     membersIdMember: {
       type: DataTypes.INTEGER(11),
+      unique: true,
       allowNull: false,
       references: {
         model: {

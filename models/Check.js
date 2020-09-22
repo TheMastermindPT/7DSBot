@@ -11,6 +11,7 @@ module.exports = function (sequelize, DataTypes) {
     membersIdMember: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
+      unique: true,
       references: {
         model: {
           tableName: 'members',

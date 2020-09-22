@@ -23,9 +23,9 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
-const addMembersFromDiscordToDb = async () => {
+const addMembersFromDiscordToDb = async (members) => {
   try {
-    const insomniacs = membersArray.map((member) => {
+    const insomniacs = members.map((member) => {
       if (member.user) {
         const { user, nickname } = member;
         const name = member.user.username;
@@ -40,7 +40,7 @@ const addMembersFromDiscordToDb = async () => {
           for (const role of _roles) {
             switch (role) {
               case ALECOLLECTORS:
-                guild.push('Ale Collectors');
+                guild.push('Insomniacs');
                 break;
               default:
                 break;
@@ -114,7 +114,7 @@ const discordToDB = async () => {
   }
 };
 
-const membersCount = () => {
+const membersCount = (members) => {
   const guild = client.guilds.cache.get(GUILDID);
   const category = guild.channels.cache.find((c) => c.id === MEMBERSCOUNTCATEGORY);
   if (!category) throw new Error('Category channel does not exist');
@@ -123,7 +123,7 @@ const membersCount = () => {
 
   let main = 0;
 
-  for (const member of membersArray) {
+  for (const member of members) {
     if (Object.keys(member).length) {
       const roles = member.roles.cache;
 
@@ -155,6 +155,7 @@ const awaitRole = async (collection, predicate) => {
 client.on('ready', async () => {
   try {
     const members = await discordToDB();
+    membersArray('cp', 'Insomniacs');
     // Update db must be in same order as updatesheet
     membersCount(members);
     // await update('cp', 'CloverHS', 'db');

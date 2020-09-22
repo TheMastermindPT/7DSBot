@@ -4,14 +4,14 @@ module.exports = function (sequelize, DataTypes) {
   const Check = sequelize.define('Check', {
     idCheck: {
       autoIncrement: true,
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
     },
     membersIdMember: {
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.UUID,
+      primaryKey: true,
       allowNull: false,
-      unique: true,
       references: {
         model: {
           tableName: 'members',

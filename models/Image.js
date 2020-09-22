@@ -4,13 +4,13 @@ module.exports = function (sequelize, DataTypes) {
   const Image = sequelize.define('Image', {
     idimages: {
       autoIncrement: true,
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.UUID,
       allowNull: false,
       primaryKey: true,
     },
     membersIdMember: {
-      type: DataTypes.INTEGER(11),
-      unique: true,
+      type: DataTypes.UUID,
+      primaryKey: true,
       allowNull: false,
       references: {
         model: {

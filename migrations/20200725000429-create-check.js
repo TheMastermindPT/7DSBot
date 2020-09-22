@@ -2,19 +2,18 @@ module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('checks', {
     idCheck: {
       autoIncrement: true,
-      type: Sequelize.INTEGER(11),
+      type: Sequelize.UUID,
       allowNull: false,
       primaryKey: true,
     },
     membersIdMember: {
-      type: Sequelize.INTEGER(11),
+      type: Sequelize.UUID,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: {
           tableName: 'members',
         },
-        key: 'idMembers',
+        key: 'idMember',
       },
     },
     date: {

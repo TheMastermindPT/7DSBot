@@ -1,6 +1,8 @@
 const Discord = require('discord.js');
 const db = require('../models/index');
 
+const FRIENDCODES = '757763401178021918';
+
 module.exports = {
   name: 'friend',
   description: 'List of commands for 7DSPatchBot',
@@ -12,7 +14,7 @@ module.exports = {
         const users = await db.Member.findAll();
 
         // FRIENDCODES CHANNEL
-        if (message.channel.id === '663213318957432887' || message.channel.id === '734182168213061723') {
+        if (message.channel.id === FRIENDCODES) {
           if (args[0] === 'set') {
             if (regex.test(args[1])) {
               const messageUser = users.find((member) => member.discordId === message.member.id);

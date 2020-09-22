@@ -25,7 +25,7 @@ for (const file of commandFiles) {
 
 const addMembersFromDiscordToDb = async (membersArray) => {
   try {
-    const clovers = membersArray.map((member) => {
+    const insomniacs = membersArray.map((member) => {
       if (member.user) {
         const { user, nickname } = member;
         const name = member.user.username;
@@ -53,7 +53,7 @@ const addMembersFromDiscordToDb = async (membersArray) => {
     });
 
     // Add member or update to DB from Discord
-    for await (const member of clovers) {
+    for await (const member of insomniacs) {
       if (member.length) {
         let name = '';
 
@@ -92,7 +92,7 @@ const addMembersFromDiscordToDb = async (membersArray) => {
         }
       }
     }
-    return clovers;
+    return insomniacs;
   } catch (err) {
     console.error(err);
   }

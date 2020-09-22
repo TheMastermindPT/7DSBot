@@ -1,13 +1,15 @@
 const Discord = require('discord.js');
 const db = require('../models/index');
 
+const INDURA = '757761628262367292';
+
 module.exports = {
   name: 'indura',
   description: 'commands for induras roles',
   execute(message, args) {
     try {
       if (args[0] === 'set') {
-        const messageAuthorHasInduraRole = message.member.roles.cache.find((role) => role.id === '734127338576412705');
+        const messageAuthorHasInduraRole = message.member.roles.cache.find((role) => role.id === INDURA);
         const url = args[1];
         const { id } = message.author;
 

@@ -293,5 +293,6 @@ const membersArray = async (sort, guild) => {
 // };
 
 module.exports = {
-  dayN, monthN, monthS, update, getWeek, membersArray,
+  // dayN, monthN, monthS, update, getWeek,
+  membersArray,
 };

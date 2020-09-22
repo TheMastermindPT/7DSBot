@@ -11,7 +11,7 @@ const MENTIONABLE = /(<@!|)(\d{18})>/i;
 const GUILDID = '753760393087680592';
 const GUILDCHAT = '753766005209301082';
 const INDURA = '757761628262367292';
-const ALECOLLECTORS = '753786077000630284';
+const INSOMNIACS = '753786077000630284';
 const MEMBERSCOUNTCATEGORY = '753789314680488018';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -39,7 +39,7 @@ const addMembersFromDiscordToDb = async (members) => {
           const { _roles } = member;
           for (const role of _roles) {
             switch (role) {
-              case ALECOLLECTORS:
+              case INSOMNIACS:
                 guild.push('Insomniacs');
                 break;
               default:
@@ -129,7 +129,7 @@ const membersCount = (members) => {
 
       for (const [index, role] of roles) {
         switch (role.id) {
-          case '':
+          case INSOMNIACS:
             main++;
             break;
           default:

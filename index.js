@@ -2,7 +2,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
-const { update } = require('./essentials/auth');
+const { membersArray } = require('./essentials/auth');
 const db = require('./models/index');
 
 // VARIABLES //
@@ -23,7 +23,7 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
-const addMembersFromDiscordToDb = async (membersArray) => {
+const addMembersFromDiscordToDb = async () => {
   try {
     const insomniacs = membersArray.map((member) => {
       if (member.user) {
@@ -114,7 +114,7 @@ const discordToDB = async () => {
   }
 };
 
-const membersCount = (membersArray) => {
+const membersCount = () => {
   const guild = client.guilds.cache.get(GUILDID);
   const category = guild.channels.cache.find((c) => c.id === MEMBERSCOUNTCATEGORY);
   if (!category) throw new Error('Category channel does not exist');
@@ -166,7 +166,7 @@ client.on('ready', async () => {
 });
 
 // Create an event listener for new guild members
-client.on('guildMemberAdd', async (member) => {
+client.on('guildMemberAdd', async () => {
   await discordToDB();
   console.log('New member in discord');
 });

@@ -119,7 +119,7 @@ const membersCount = (members) => {
   const category = guild.channels.cache.find((c) => c.id === MEMBERSCOUNTCATEGORY);
   if (!category) throw new Error('Category channel does not exist');
 
-  const aleCollectors = guild.channels.cache.find((c) => c.id === '757760492952354816');
+  const insomniacs = guild.channels.cache.find((c) => c.id === '757760492952354816');
 
   let main = 0;
 
@@ -140,7 +140,7 @@ const membersCount = (members) => {
   }
 
   // Not updating in real time dont know why //
-  aleCollectors.edit({ name: `Ale Collectors: ${main}` });
+  insomniacs.edit({ name: `Insomniacs: ${main}` });
 };
 
 const awaitRole = async (collection, predicate) => {

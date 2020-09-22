@@ -8,11 +8,15 @@ const db = require('./models/index');
 // VARIABLES //
 const { PREFIX, TOKEN } = process.env;
 const MENTIONABLE = /(<@!|)(\d{18})>/i;
-const guildID = '662888155501821953';
+const GUILDID = '753760393087680592';
+const GUILDCHAT = '753766005209301082';
+const INDURA = '757761628262367292';
+const ALECOLLECTORS = '753786077000630284';
+const MEMBERSCOUNTCATEGORY = '753789314680488018';
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
-const guildRoles = ['734123118402076672', '734123385940082698', '735107783900528751'];
+const guildRoles = ['753786077000630284'];
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -35,14 +39,8 @@ const addMembersFromDiscordToDb = async (membersArray) => {
           const { _roles } = member;
           for (const role of _roles) {
             switch (role) {
-              case '735107783900528751':
-                guild.push('CloverUR');
-                break;
-              case '734123385940082698':
-                guild.push('CloverHS');
-                break;
-              case '734123118402076672':
-                guild.push('Clover');
+              case ALECOLLECTORS:
+                guild.push('Ale Collectors');
                 break;
               default:
                 break;
@@ -60,23 +58,15 @@ const addMembersFromDiscordToDb = async (membersArray) => {
         let name = '';
 
         if (member[0].nick) {
-          name = member[0].nick.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
+          name = member[0].nick.replace(/[^a-zA-Z0-9]/g, '');
         } else {
-          name = member[0].username.replace(/(c ł)|[^a-zA-Z0-9]/g, '');
+          name = member[0].username.replace(/[^a-zA-Z0-9]/g, '');
         }
         // eslint-disable-next-line prefer-const
         let [{ id }, ...guild] = member;
         guild.sort();
         const guildJSON = JSON.stringify(guild);
 
-        // if (member[1] === 'CloverHS') {
-        //   if (!member[0].nick) {
-        //     console.log(member[0].username);
-        //   } else {
-        //     console.log(member[0].nick);
-        //   }
-        // }
-        // Creates or updates user if it belongs to one of the guilds or friends of Guild
         if (JSON.parse(guildJSON).length) {
           const [user, created] = await db.Member.findOrCreate({
             where: { discordId: id },
@@ -110,8 +100,8 @@ const addMembersFromDiscordToDb = async (membersArray) => {
 
 const discordToDB = async () => {
   try {
-    const cloverDiscord = await client.guilds.fetch(guildID);
-    const members = cloverDiscord.members.cache.map((member) => {
+    const insomniacs = await client.guilds.fetch(GUILDID);
+    const members = insomniacs.members.cache.map((member) => {
       if (!member.user.bot) {
         return member;
       }
@@ -125,17 +115,13 @@ const discordToDB = async () => {
 };
 
 const membersCount = (membersArray) => {
-  const guild = client.guilds.cache.get('662888155501821953');
-  const category = guild.channels.cache.find((c) => c.id === '734907156410663084');
+  const guild = client.guilds.cache.get(GUILDID);
+  const category = guild.channels.cache.find((c) => c.id === MEMBERSCOUNTCATEGORY);
   if (!category) throw new Error('Category channel does not exist');
 
-  const clover = guild.channels.cache.find((c) => c.id === '741046564528717947');
-  const cloverHS = guild.channels.cache.find((c) => c.id === '741046688252297256');
-  const cloverUR = guild.channels.cache.find((c) => c.id === '741046764706070649');
+  const aleCollectors = guild.channels.cache.find((c) => c.id === '757760492952354816');
 
   let main = 0;
-  let hs = 0;
-  let ur = 0;
 
   for (const member of membersArray) {
     if (Object.keys(member).length) {
@@ -143,14 +129,8 @@ const membersCount = (membersArray) => {
 
       for (const [index, role] of roles) {
         switch (role.id) {
-          case '734123118402076672':
+          case '':
             main++;
-            break;
-          case '734123385940082698':
-            hs++;
-            break;
-          case '735107783900528751':
-            ur++;
             break;
           default:
             break;
@@ -160,9 +140,7 @@ const membersCount = (membersArray) => {
   }
 
   // Not updating in real time dont know why //
-  clover.edit({ name: `Clovers: ${main}` });
-  cloverHS.edit({ name: `CloversHS: ${hs}` });
-  cloverUR.edit({ name: `CloversUR: ${ur}` });
+  aleCollectors.edit({ name: `Ale Collectors: ${main}` });
 };
 
 const awaitRole = async (collection, predicate) => {
@@ -195,14 +173,13 @@ client.on('guildMemberAdd', async (member) => {
 
 client.on('guildMemberRemove', async (member) => {
   try {
-    const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
+    const welcomeChannel = client.channels.cache.find((channel) => channel.id === GUILDCHAT);
     const found = await db.Member.findOne({ where: { discordId: member.id } });
     if (!found.length) throw new Error('The found object is empty');
 
     await db.Check.destroy({ where: { membersIdMember: found.idMember } });
     await db.Image.destroy({ where: { membersIdMember: found.idMember } });
     await db.Member.destroy(found);
-    await update('cp', 'CloverHS', 'sheet');
     console.log(`The member ${member.user.username} was kicked from the server`);
     return welcomeChannel.send(`Our member <@${member.id}> left or was kicked from the server`);
   } catch (err) {
@@ -221,7 +198,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     const newRoles = newMember.roles.cache;
     const oldRoles = oldMember.roles.cache;
     const diff = oldRoles.difference(newRoles);
-    const welcomeChannel = client.channels.cache.find((channel) => channel.id === '740212787976077373');
+    const welcomeChannel = client.channels.cache.find((channel) => channel.id === GUILDCHAT);
 
     const guildRole = await awaitRole(diff, (role) => {
       const some = guildRoles.some((value) => value === role.id);
@@ -268,7 +245,7 @@ client.on('message', async (message) => {
       const memberMentioned = message.channel.members.find((member) => member.user.id === mentionUserId);
       if (!memberMentioned) return;
       const mentionedUserRoles = memberMentioned.roles.cache;
-      const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === '734127338576412705');
+      const memberHasInduraRole = mentionedUserRoles.find((role) => role.id === INDURA);
 
       // eslint-disable-next-line max-len
       const mentionedUserInGuild = await db.Member.findOne({ where: { discordId: mentionUserId }, include: db.Image });
